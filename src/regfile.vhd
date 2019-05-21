@@ -21,6 +21,7 @@ architecture rtl of regfile is
 	signal reg : reg_t;
 begin  -- rtl
 	-- one-process-method becouse of the hint in the assignment to use the implementation guidelines
+	-- outputs are also synchronised becouse of the assignment
 	sync : process(clk, reset)
 	begin
 		if reset = '0' then
