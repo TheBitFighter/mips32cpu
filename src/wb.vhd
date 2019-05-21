@@ -38,7 +38,7 @@ begin  -- rtl
 			else
 				result <= aluresult;
 			end if;
-			if flush = '0' then
+			if flush = '1' then
 				rd_out <= (others => '0');
 				result <= (others => '0');
 				regwrite <= '0';
