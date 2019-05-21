@@ -30,18 +30,18 @@ begin  -- rtl
 			rd_out <= (others => '0');
 			result <= (others => '0');
 			regwrite <= '0';
-		elsif rising_edge(clk) then
-			regwrite <= '0';
-			rd_out <= (others => '0');
-
-			if flush = '0' and stall = '0' then
-				if op.memtoreg = '1' then
-					result <= memresult;
-				else
-					result <= aluresult;
-				end if;
-				regwrite <= op.regwrite;
-				rd_out <= rd_in;
+		elsif rising_edge(clk) and stall = '0' then
+			regwrite <= op.regwrite;
+			rd_out <= rd_in;
+			if op.memtoreg = '1' then
+				result <= memresult;
+			else
+				result <= aluresult;
+			end if;
+			if flush = '0' then
+				rd_out <= (others => '0');
+				result <= (others => '0');
+				regwrite <= '0';
 			end if;
 		end if;
 	end process;
