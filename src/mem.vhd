@@ -114,26 +114,26 @@ begin  -- rtl
 				exc_load <= exc_load_reg;
 				exc_store <= exc_store_reg;
 
-				if flush = '1' then
-					-- reset outputs
-					pc_out <= (others => '0');
-					pcsrc <= '0';
-					rd_out <= (others => '0');
-					aluresult_out <= (others => '0');
-					memresult <= (others => '0');
-					new_pc_out <= (others => '0');
-					wbop_out <= WB_NOP;
-					mem_out.address <= (others => '0');
-					mem_out.rd <= '0';
-					mem_out.wr <= '0';
-					mem_out.byteena <= (others => '0');
-					mem_out.wrdata <= (others => '0');
-					exc_load <= '0';
-					exc_store <= '0';
-				end if;
 			else
 				mem_op_reg.memread <= '0';
 				mem_op_reg.memwrite <= '0';
+			end if;
+			if flush = '1' then
+				-- reset outputs
+				pc_out <= (others => '0');
+				pcsrc <= '0';
+				rd_out <= (others => '0');
+				aluresult_out <= (others => '0');
+				memresult <= (others => '0');
+				new_pc_out <= (others => '0');
+				wbop_out <= WB_NOP;
+				mem_out.address <= (others => '0');
+				mem_out.rd <= '0';
+				mem_out.wr <= '0';
+				mem_out.byteena <= (others => '0');
+				mem_out.wrdata <= (others => '0');
+				exc_load <= '0';
+				exc_store <= '0';
 			end if;
 		end if;
 	end process;
