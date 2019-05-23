@@ -27,6 +27,9 @@ begin  -- rtl
 		AA := W(BYTE_WIDTH-1 downto 0);
 		XX := (others => '-');
 
+		M.byteena <= (others => '0');
+		M.wrdata <= (others => '0');
+
 		case op.memtype is
 			when MEM_B | MEM_BU =>
 				case A(1 downto 0) is
@@ -76,6 +79,8 @@ begin  -- rtl
 		AA := D(BYTE_WIDTH-1 downto 0);
 		SS := (others => '0');
 		zero := (others => '0');
+
+		R <= (others => '0');
 
 		case op.memtype is
 			when MEM_B =>
