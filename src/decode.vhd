@@ -36,29 +36,16 @@ architecture rtl of decode is
 			regwrite         : in  std_logic);
 	end component;
 
-	signal rdaddr1, rdaddr2 : std_logic_vector(REG_BITS-1 downto 0);
-	signal rddata1, rddata2 : std_logic_vector(DATA_WIDTH-1 downto 0);
-
-	signal opcode : std_logic_vector(5 downto 0);
-	signal rs : std_logic_vector(4 downto 0);
-	signal rt : std_logic_vector(4 downto 0);
-	signal rd : std_logic_vector(4 downto 0);
-	signal shamt : std_logic_vector(4 downto 0);
-	signal func : std_logic_vector(5 downto 0);
-	signal address, immediate : std_logic_vector(15 downto 0);
-	signal target_adress : std_logic_vector(25 downto 0);
+	signal opcode_reg : std_logic_vector(5 downto 0);
+	signal rs_reg : std_logic_vector(4 downto 0);
+	signal rt_reg : std_logic_vector(4 downto 0);
+	signal rd_r_reg : std_logic_vector(4 downto 0);
+	signal rd_i_reg : std_logic_vector(4 downto 0);
+	signal shamt_reg : std_logic_vector(4 downto 0);
+	signal func_reg : std_logic_vector(5 downto 0);
+	signal address_immediante_reg : std_logic_vector(15 downto 0);
+	signal target_address_reg : std_logic_vector(25 downto 0);
 begin  -- rtl
-
-	opcode <= instr(31 downto 26);
-	rs <= instr(25 downto 21);
-	rt <= instr(20 downto 16);
-	rd <= instr(15 downto 11) when opcode = "000000" or opcode = "010000" else instr(20 downto 16); -- R or I format
-	shamt <= instr(10 downto 6);
-	func <= instr(5 downto 0);
-	address <= instr(15 downto 0);
-	immediate <= instr(15 downto 0);
-	target_adress <= instr(25 downto 0);
-
 	decode : process(clk, reset)
 	begin
 		if reset = '0' then
@@ -70,34 +57,23 @@ begin  -- rtl
 			wb_op <= WB_NOP;
 			exc_dec <= '0';
 		elsif rising_edge(clk) then
-			pc_out <= pc_in;
-			exec_op <= EXEC_NOP;
-			cop0_op <= COP0_NOP;
-			jmp_op <= JMP_NOP;
-			mem_op <= MEM_NOP;
-			wb_op <= WB_NOP;
-			exc_dec <= '0';
+			if stall = '0' then
+				pc_out <= pc_in;
 
-			exec_op.readdata1 <= rddata1;
-			exec_op.readdata2 <= rddata2;
-			exec_op.rs <= rs;
-			exec_op.rt <= rt;
-			exec_op.rd <= rd;
+				opcode_reg <= instr(31 downto 26);
+				rs_reg <= instr(25 downto 21);
+				rt_reg <= instr(20 downto 16);
+				rd_r_reg <= instr(15 downto 11);
+				rd_i_reg <= instr(20 downto 16);
+				shamt_reg <= instr(10 downto 6);
+				func_reg <= instr(5 downto 0);
+				address_immediante_reg <= instr(15 downto 0);
+				target_address_reg <= instr(25 downto 0);
 
-			case opcode is
-				when "000000" => --MiMi special instructions
-					case func is
-						when "000000" => -- SLL
-							exec_op.aluop <= ALU_SLL;
-							exec_op.useamt <= '1';
+			end if;
+			if flush = '1' then
 
-
-						when others =>
-
-					end case;
-				when others =>
-
-			end case;
+			end if;
 		end if;
 	end process;
 
@@ -105,13 +81,13 @@ begin  -- rtl
 	port map(
 		clk => clk,
 		reset => reset,
-		rdaddr1 => rdaddr1,
-		rdaddr2 => rdaddr2,
-		rddata1 => rddata1,
-		rddata2 => rddata2,
-		wraddr => wraddr,
-		wrdata => wrdata,
-		regwrite => regwrite
+		rdaddr1 => ,
+		rdaddr2 => ,
+		rddata1 => ,
+		rddata2 => ,
+		wraddr => ,
+		wrdata => ,
+		regwrite =>
 	);
 
 end rtl;
