@@ -33,22 +33,26 @@ begin  -- rtl
 			if regwrite = '1' then
 				reg(to_integer(unsigned(wraddr))) <= wrdata;
 			end if;
-			-- read 1
-			if rdaddr1 = (REG_BITS-1 downto 0 => '0') then
-				rddata1 <= (others => '0');
-			elsif rdaddr1 = wraddr and regwrite = '1' then
-				rddata1 <= wrdata;
-			else
-				rddata1 <= reg(to_integer(unsigned(rdaddr1)));
-			end if;
-			-- read 2
-			if rdaddr2 = (REG_BITS-1 downto 0 => '0') then
-				rddata2 <= (others => '0');
-			elsif rdaddr2 = wraddr and regwrite = '1' then
-				rddata2 <= wrdata;
-			else
-				rddata2 <= reg(to_integer(unsigned(rdaddr2)));
-			end if;
+		end if;
+	end process;
+
+	async_out : process(all)
+	begin
+		-- read 1
+		if rdaddr1 = (REG_BITS-1 downto 0 => '0') then
+			rddata1 <= (others => '0');
+		elsif rdaddr1 = wraddr and regwrite = '1' then
+			rddata1 <= wrdata;
+		else
+			rddata1 <= reg(to_integer(unsigned(rdaddr1)));
+		end if;
+		-- read 2
+		if rdaddr2 = (REG_BITS-1 downto 0 => '0') then
+			rddata2 <= (others => '0');
+		elsif rdaddr2 = wraddr and regwrite = '1' then
+			rddata2 <= wrdata;
+		else
+			rddata2 <= reg(to_integer(unsigned(rdaddr2)));
 		end if;
 	end process;
 end rtl;
