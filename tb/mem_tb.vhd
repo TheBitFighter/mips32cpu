@@ -89,12 +89,15 @@ begin
     wait for CLK_PERIOD*2;
     pc_in <= (others => '1');
     wait for CLK_PERIOD;
+    mem_op.memtype <= MEM_B;
     mem_op.memread <= '1';
 
     wait for CLK_PERIOD;
-    --stall <= '1';
-    --pc_in <= (0 => '0', others => '1');
+    pc_in <= (0 => '0', others => '1');
     aluresult_in <= (others => '1');
+
+    wait for CLK_PERIOD*2;
+    stall <= '1';
 
     wait for CLK_PERIOD;
     stall <= '0';
