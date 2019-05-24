@@ -53,23 +53,64 @@ architecture rtl of mem is
 	end component;
 
 	-- internal registers
-	signal jmp_op_reg : jmp_op_type;
-	signal zero_reg : std_logic;
-	signal neg_reg : std_logic;
-	signal pcsrc_reg : std_logic;
-	signal mem_op_reg : mem_op_type;
-	signal aluresult_in_reg : std_logic_vector(DATA_WIDTH-1 downto 0);
-	signal wrdata_reg : std_logic_vector(DATA_WIDTH-1 downto 0);
-	signal mem_data_reg : std_logic_vector(DATA_WIDTH-1 downto 0);
-	signal memresult_reg : std_logic_vector(DATA_WIDTH-1 downto 0);
-	signal mem_out_reg : mem_out_type;
-	signal exc_load_reg : std_logic;
-	signal exc_store_reg : std_logic;
+	-- in
+	signal flush_reg          : std_logic;
+	signal mem_op_reg         : mem_op_type;
+	signal jmp_op_reg         : jmp_op_type;
+	signal pc_in_reg          : std_logic_vector(PC_WIDTH-1 downto 0);
+	signal rd_in_reg          : std_logic_vector(REG_BITS-1 downto 0);
+	signal aluresult_in_reg   : std_logic_vector(DATA_WIDTH-1 downto 0);
+	signal wrdata_reg         : std_logic_vector(DATA_WIDTH-1 downto 0);
+	signal zero_reg , neg_reg : std_logic;
+	signal new_pc_in_reg      : std_logic_vector(PC_WIDTH-1 downto 0);
+	signal wbop_in_reg        : wb_op_type;
+	signal mem_data_reg       : std_logic_vector(DATA_WIDTH-1 downto 0);
+	-- out
+	signal pcsrc_reg					: std_logic;
+	signal mem_out_reg				: mem_out_type;
+	signal memresult_reg			: std_logic_vector(DATA_WIDTH-1 downto 0);
+	signal exc_load_reg				: std_logic;
+	signal exc_store_reg			: std_logic;
 begin  -- rtl
 	mem : process(clk, reset)
 	begin
 		if reset = '0' then
-			-- reset outputs
+			flush_reg <= '0';
+			mem_op_reg <= MEM_NOP;
+			jmp_op_reg <= JMP_NOP;
+			pc_in_reg <= (others => '0');
+			rd_in_reg <= (others => '0');
+			aluresult_in_reg <= (others => '0');
+			wrdata_reg <= (others => '0');
+			zero_reg <= '0';
+			neg_reg <= '0';
+			new_pc_in_reg <= (others => '0');
+			wbop_in_reg <= WB_NOP;
+			mem_data_reg <= (others => '0');
+		elsif rising_edge(clk) then
+			if stall = '0' then
+				flush_reg <= flush;
+				mem_op_reg <= mem_op;
+				jmp_op_reg <= jmp_op;
+				pc_in_reg <= pc_in;
+				rd_in_reg <= rd_in;
+				aluresult_in_reg <= aluresult_in;
+				wrdata_reg <= wrdata;
+				zero_reg <= zero;
+				neg_reg <= neg;
+				new_pc_in_reg <= new_pc_in;
+				wbop_in_reg <= wbop_in;
+				mem_data_reg <= mem_data;
+			else
+				mem_op_reg.memread <= '0';
+				mem_op_reg.memwrite <= '0';
+			end if;
+		end if;
+	end process;
+
+	outputs : process(all)
+	begin
+		if flush_reg = '1' then
 			pc_out <= (others => '0');
 			pcsrc <= '0';
 			rd_out <= (others => '0');
@@ -80,69 +121,27 @@ begin  -- rtl
 			mem_out.address <= (others => '0');
 			mem_out.rd <= '0';
 			mem_out.wr <= '0';
-			mem_out.byteena <= (others => '0');
-			mem_out.wrdata <= (others => '0');
 			exc_load <= '0';
 			exc_store <= '0';
-			-- reset internal registers
-			jmp_op_reg <= JMP_NOP;
-			zero_reg <= '0';
-			neg_reg <= '0';
-			pcsrc_reg <= '0';
-			mem_op_reg <= MEM_NOP;
-			aluresult_in_reg <= (others => '0');
-			wrdata_reg <= (others => '0');
-			mem_data_reg <= (others => '0');
-		elsif rising_edge(clk) then
-			if stall = '0' then
-				new_pc_out <= new_pc_in;
-				pc_out <= pc_in;
-				rd_out <= rd_in;
-				wbop_out <= wbop_in;
-				aluresult_out <= aluresult_in;
-
-				jmp_op_reg <= jmp_op;
-				zero_reg <= zero;
-				neg_reg <= neg;
-				mem_op_reg <= mem_op;
-				aluresult_in_reg <= aluresult_in;
-				wrdata_reg <= wrdata;
-
-				pcsrc <= pcsrc_reg;
-				memresult <= memresult_reg;
-				mem_out <= mem_out_reg;
-				exc_load <= exc_load_reg;
-				exc_store <= exc_store_reg;
-
-			else
-				mem_op_reg.memread <= '0';
-				mem_op_reg.memwrite <= '0';
-			end if;
-			if flush = '1' then
-				-- reset outputs
-				pc_out <= (others => '0');
-				pcsrc <= '0';
-				rd_out <= (others => '0');
-				aluresult_out <= (others => '0');
-				memresult <= (others => '0');
-				new_pc_out <= (others => '0');
-				wbop_out <= WB_NOP;
-				mem_out.address <= (others => '0');
-				mem_out.rd <= '0';
-				mem_out.wr <= '0';
-				mem_out.byteena <= (others => '0');
-				mem_out.wrdata <= (others => '0');
-				exc_load <= '0';
-				exc_store <= '0';
-			end if;
+		else
+			pc_out <= pc_in_reg;
+			pcsrc <= pcsrc_reg;
+			rd_out <= rd_in_reg;
+			aluresult_out <= aluresult_in_reg;
+			memresult <= memresult_reg;
+			new_pc_out <= new_pc_in_reg;
+			wbop_out <= wbop_in_reg;
+			mem_out <= mem_out_reg;
+			exc_load <= exc_load_reg;
+			exc_store <= exc_store_reg;
 		end if;
 	end process;
 
 	jmpu_inst : jmpu
 	port map(
 		op => jmp_op_reg,
-		N => neg,
-		Z => zero,
+		N => neg_reg,
+		Z => zero_reg,
 		J => pcsrc_reg
 	);
 
