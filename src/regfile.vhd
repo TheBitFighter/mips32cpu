@@ -28,9 +28,9 @@ begin  -- rtl
 			reg <= (others => (others => '0'));
 			rddata1 <= (others => '0');
 			rddata2 <= (others => '0');
-		elsif rising_edge(clk) and stall = '0' then
+		elsif rising_edge(clk) then
 			-- write to register
-			if regwrite = '1' then
+			if regwrite = '1' and stall = '0' then
 				reg(to_integer(unsigned(wraddr))) <= wrdata;
 			end if;
 		end if;
