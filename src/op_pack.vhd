@@ -35,13 +35,14 @@ package op_pack is
 		regdst     : std_logic;
 		cop0       : std_logic;
 		ovf        : std_logic;
+		shamt			 : std_logic_vector(4 downto 0);
 	end record;
 
 	constant EXEC_NOP : exec_op_type :=
 		(ALU_NOP,
 		 (others => '0'), (others => '0'), (others => '0'),
 		 (others => '0'), (others => '0'), (others => '0'),
-		 '0', '0', '0', '0', '0', '0', '0');
+		 '0', '0', '0', '0', '0', '0', '0', (others => '0'));
 
 	type cop0_op_type is
 	record
@@ -51,7 +52,7 @@ package op_pack is
 
 	constant COP0_NOP : cop0_op_type :=
 		('0', (others => '0'));
-	
+
 	type memtype_type is (
 		MEM_W,
 		MEM_H,
@@ -68,7 +69,7 @@ package op_pack is
 		JMP_BGTZ,
 		JMP_BLTZ,
 		JMP_BGEZ);
-	
+
 	type mem_op_type is
 	record
 		memread  : std_logic;
@@ -91,7 +92,7 @@ package op_pack is
 		busy   : std_logic;
 		rddata : std_logic_vector(DATA_WIDTH-1 downto 0);
 	end record;
-	
+
 	type wb_op_type is
 	record
 		memtoreg : std_logic;
@@ -100,6 +101,6 @@ package op_pack is
 
 	constant WB_NOP : wb_op_type := ('0', '0');
 
-	type fwd_type is (FWD_NONE, FWD_ALU, FWD_WB);	
+	type fwd_type is (FWD_NONE, FWD_ALU, FWD_WB);
 
 end op_pack;
