@@ -74,6 +74,11 @@ begin
     rdaddr2 <= (others => '0');
     wait for CLK_PERIOD*4;
 
+    regwrite <= '0';
+    rdaddr1 <= std_logic_vector(to_unsigned(0, REG_BITS));
+    rdaddr2 <= (others => '0');
+    wait for CLK_PERIOD*4;
+
     wraddr <= std_logic_vector(to_unsigned(20, REG_BITS));
     wrdata <= (others => '1');
     regwrite <= '1';

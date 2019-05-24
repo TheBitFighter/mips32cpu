@@ -26,8 +26,6 @@ begin  -- rtl
 	begin
 		if reset = '0' then
 			reg <= (others => (others => '0'));
-			rddata1 <= (others => '0');
-			rddata2 <= (others => '0');
 		elsif rising_edge(clk) then
 			-- write to register
 			if regwrite = '1' and stall = '0' then
