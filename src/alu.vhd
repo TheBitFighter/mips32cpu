@@ -95,7 +95,11 @@ begin
 				end if;
 
 			when others =>
+<<<<<<< HEAD
 				if (A = (0 to DATA_WIDTH-1 => '0')) then
+=======
+				if (A = (DATA_WIDTH-1 downto 0 => '0')) then
+>>>>>>> 1e7e175a89ec90c3ff1222b4686ea591624b7d3d
 					Z <= '1';
 				else
 					Z <= '0';
