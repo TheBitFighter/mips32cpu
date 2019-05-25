@@ -92,6 +92,14 @@ begin
     regwrite <= '0';
     rdaddr1 <= std_logic_vector(to_unsigned(3, REG_BITS));
     wait for CLK_PERIOD;
+    rdaddr1 <= std_logic_vector(to_unsigned(20, REG_BITS));
+    wait for CLK_PERIOD;
+    wraddr <= (others => '0');
+    rdaddr1 <= (others => '0');
+    rdaddr2 <= (others => '0');
+    stall <= '1';
+    wait for CLK_PERIOD;
+    stall <= '0';
 
     wait;
   end process;
