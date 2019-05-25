@@ -151,7 +151,7 @@ begin  -- rtl
 		XL <= '0';
 		XS <= '0';
 
-		if (op.memread = '1' and A = (others => '0')) 		or
+		if (op.memread = '1' and A = (ADDR_WIDTH-1 downto 0 => '0')) 		or
 			 (op.memread = '1' and op.memtype 	 = MEM_H 		and (A(1 downto 0) = "01" or A(1 downto 0) = "11")) or
 			 (op.memread = '1' and op.memtype 	 = MEM_HU		and (A(1 downto 0) = "01" or A(1 downto 0) = "11")) or
 			 (op.memread = '1' and op.memtype 	 = MEM_W	 	and (A(1 downto 0) = "01" or A(1 downto 0) = "10" 	or A(1 downto 0) = "11")) then
@@ -160,7 +160,7 @@ begin  -- rtl
 				 M.wr <= '0';
 		end if;
 
-		if (op.memwrite = '1' and A = (others => '0'))		or
+		if (op.memwrite = '1' and A = (ADDR_WIDTH-1 downto 0 => '0'))		or
 			 (op.memwrite = '1' and op.memtype 		= MEM_H		and (A(1 downto 0) = "01" or A(1 downto 0) = "11")) or
 			 (op.memwrite = '1' and op.memtype 		= MEM_HU 	and (A(1 downto 0) = "01" or A(1 downto 0) = "11")) or
 			 (op.memwrite = '1' and op.memtype 		= MEM_W 	and (A(1 downto 0) = "01" or A(1 downto 0) = "10" 	or A(1 downto 0) = "11")) then
