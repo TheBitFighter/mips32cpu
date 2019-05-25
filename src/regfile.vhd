@@ -16,16 +16,14 @@ entity regfile is
 end regfile;
 
 architecture rtl of regfile is
-	subtype word_t is std_logic_vector(DATA_WIDTH-1 downto 0);
-	type reg_t is array(2**REG_BITS-1 downto 0) of word_t;
+	type reg_t is array(2**REG_BITS-1 downto 0) of std_logic_vector(DATA_WIDTH-1 downto 0);
 	signal reg : reg_t;
 begin  -- rtl
 	-- one-process-method becouse of the hint in the assignment to use the implementation guidelines
-	-- outputs are also synchronised becouse of the assignment
 	sync : process(clk, reset)
 	begin
 		if reset = '0' then
-			reg <= (others => (others => '0'));
+			reg <= ((others => (others => '0')));
 		elsif rising_edge(clk) then
 			-- write to register
 			if regwrite = '1' and stall = '0' then
@@ -34,23 +32,31 @@ begin  -- rtl
 		end if;
 	end process;
 
-	async_out : process(all)
-	begin
-		-- read 1
-		if rdaddr1 = (REG_BITS-1 downto 0 => '0') then
-			rddata1 <= (others => '0');
-		elsif rdaddr1 = wraddr and regwrite = '1' then
-			rddata1 <= wrdata;
-		else
-			rddata1 <= reg(to_integer(unsigned(rdaddr1)));
-		end if;
-		-- read 2
-		if rdaddr2 = (REG_BITS-1 downto 0 => '0') then
-			rddata2 <= (others => '0');
-		elsif rdaddr2 = wraddr and regwrite = '1' then
-			rddata2 <= wrdata;
-		else
-			rddata2 <= reg(to_integer(unsigned(rdaddr2)));
-		end if;
-	end process;
+	rddata1 <= (others => '0') when rdaddr1 = (REG_BITS-1 downto 0 => '0') else
+						wrdata when (rdaddr1 = wraddr and regwrite = '1') else
+						reg(to_integer(unsigned(rdaddr1)));
+
+	rddata2 <= (others => '0') when rdaddr2 = (REG_BITS-1 downto 0 => '0') else
+						wrdata when (rdaddr2 = wraddr and regwrite = '1') else
+						reg(to_integer(unsigned(rdaddr2)));
+
+	-- async_out : process(all)
+	-- begin
+	-- 	-- read 1
+	-- 	if rdaddr1 = (REG_BITS-1 downto 0 => '0') then
+	-- 		rddata1 <= (others => '0');
+	-- 	elsif rdaddr1 = wraddr and regwrite = '1' then
+	-- 		rddata1 <= wrdata;
+	-- 	else
+	-- 		rddata1 <= reg(to_integer(unsigned(rdaddr1)));
+	-- 	end if;
+	-- 	-- read 2
+	-- 	if rdaddr2 = (REG_BITS-1 downto 0 => '0') then
+	-- 		rddata2 <= (others => '0');
+	-- 	elsif rdaddr2 = wraddr and regwrite = '1' then
+	-- 		rddata2 <= wrdata;
+	-- 	else
+	-- 		rddata2 <= reg(to_integer(unsigned(rdaddr2)));
+	-- 	end if;
+	-- end process;
 end rtl;

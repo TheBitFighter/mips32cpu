@@ -51,13 +51,13 @@ begin
     wraddr <= (others => '0');
     wrdata <= (others => '0');
     regwrite <= '0';
-    wait for CLK_PERIOD*4;
+    wait for CLK_PERIOD;
 
     reset <= '1';
     wraddr <= std_logic_vector(to_unsigned(2, REG_BITS));
     wrdata <= (others => '1');
     regwrite <= '1';
-    wait for CLK_PERIOD*4;
+    wait for CLK_PERIOD;
 
     wraddr <= std_logic_vector(to_unsigned(5, REG_BITS));
     wrdata <= (others => '1');
@@ -67,27 +67,31 @@ begin
     wraddr <= (others => '0');
     wrdata <= (others => '1');
     regwrite <= '1';
-    wait for CLK_PERIOD*4;
+    wait for CLK_PERIOD;
 
     regwrite <= '0';
     rdaddr1 <= std_logic_vector(to_unsigned(2, REG_BITS));
     rdaddr2 <= (others => '0');
-    wait for CLK_PERIOD*4;
+    wait for CLK_PERIOD;
 
     regwrite <= '0';
     rdaddr1 <= std_logic_vector(to_unsigned(0, REG_BITS));
     rdaddr2 <= (others => '0');
-    wait for CLK_PERIOD*4;
+    wait for CLK_PERIOD;
 
     wraddr <= std_logic_vector(to_unsigned(20, REG_BITS));
     wrdata <= (others => '1');
     regwrite <= '1';
     rdaddr1 <= std_logic_vector(to_unsigned(20, REG_BITS));
-    wait for CLK_PERIOD*4;
+    wait for CLK_PERIOD;
 
     stall <= '1';
-    wait for CLK_PERIOD*4;
+    wraddr <= std_logic_vector(to_unsigned(3, REG_BITS));
+    wait for CLK_PERIOD;
     stall <= '0';
+    regwrite <= '0';
+    rdaddr1 <= std_logic_vector(to_unsigned(3, REG_BITS));
+    wait for CLK_PERIOD;
 
     wait;
   end process;
