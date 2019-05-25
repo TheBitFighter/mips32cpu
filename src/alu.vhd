@@ -17,7 +17,7 @@ end alu;
 
 architecture rtl of alu is
 
-	signal ovf : std_logic := '0';
+	signal calc : std_logic_vector(DATA_WIDTH-1 downto 0);
 
 begin
 
@@ -29,42 +29,40 @@ begin
 				R <= A;
 
 			when ALU_LUI =>
-				R <= B sll 16;
+				R <= std_logic_vector(shift_left(unsigned(B), 16));
 
 			when ALU_SLT =>
-				R <= signed(A) < signed(B) ? '1' : '0';
+				if (signed(A) < signed(B)) then
+				 R <= (others=>'0');
+				 R(0) <= '1';
+			 else
+				 R <= (others=>'0');
+			 end if;
 
 			when ALU_SLTU =>
-				R <= unsigned(A) < unsigned(B) ? '1' : '0';
+				if (unsigned(A) < unsigned(B)) then
+					R <= (others=>'0');
+ 					R(0) <= '1';
+				else
+					R <= (others=>'0');
+				end if;
 
 			when ALU_SLL =>
-				R <= B sll A(DATA_WIDTH-1 downto 0);
+				R <= std_logic_vector(shift_left(unsigned(B), to_integer(unsigned(A))));
 
 			when ALU_SRL =>
-				R <= B srl A(DATA_WIDTH-1 downto 0);
+				R <= std_logic_vector(shift_right(unsigned(B), to_integer(unsigned(A))));
 
 			when ALU_SRA =>
-				R <= B sra A(DATA_WIDTH-1 downto 0);
+				R <= std_logic_vector(shift_right(signed(B), to_integer(unsigned(A))));
 
 			when ALU_ADD =>
 				R <= std_logic_vector(signed(A) + signed(B));
-				if (signed(A) >= 0 and signed(B) >= 0 and signed(R) < 0) then
-					ovf <= '1';
-				elsif (signed(A) < 0 and signed(B) < 0 and signed(R) >= 0) then
-					ovf <= '1';
-				else
-					ovf <= '0';
-				end if;
+				calc <= std_logic_vector(signed(A) + signed(B));
 
 			when ALU_SUB =>
 				R <= std_logic_vector(signed(A) - signed(B));
-				if (signed(A) >= 0 and signed(B) < 0 and signed(R) < 0) then
-					ovf <= '1';
-				elsif (signed(A) < 0 and signed(B) >= 0 and signed(R) >= 0) then
-					ovf <= '1';
-				else
-					ovf <= '0';
-				end if;
+				calc <= std_logic_vector(signed(A) - signed(B));
 
 			when ALU_AND =>
 				R <= A and B;
@@ -78,7 +76,7 @@ begin
 			when ALU_NOR =>
 				R <= not (A or B);
 
-			others =>
+			when others =>
 				R <= (others=>'0');
 
 		end case;
@@ -97,7 +95,7 @@ begin
 				end if;
 
 			when others =>
-				if (A = std_logic_vector(signed(0), DATA_WIDTH)) then
+				if (A = (others=>'0')) then
 					Z <= '1';
 				else
 					Z <= '0';
@@ -108,20 +106,32 @@ begin
 	end process;
 
   -- Process to determine the state of the overflow bit
-	overflow : process(op)
+	overflow : process(op, calc)
+	begin
 		case op is
 
 			when ALU_ADD =>
-				V <= ovf;
+				if (signed(A) >= 0 and signed(B) >= 0 and signed(calc) < 0) then
+					V <= '1';
+				elsif (signed(A) < 0 and signed(B) < 0 and signed(calc) >= 0) then
+					V <= '1';
+				else
+					V <= '0';
+				end if;
 
 			when ALU_SUB =>
-				V <= ovf;
+				if (signed(A) >= 0 and signed(B) < 0 and signed(calc) < 0) then
+					V <= '1';
+				elsif (signed(A) < 0 and signed(B) >= 0 and signed(calc) >= 0) then
+					V <= '1';
+				else
+					V <= '0';
+				end if;
 
 			when others =>
 				V <= '0';
 
-		end case;
-	begin
+			end case;
 
 	end process;
 
