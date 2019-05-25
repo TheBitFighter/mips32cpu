@@ -24,13 +24,12 @@ begin
 
 	fetcher : process(clk)
 	begin
-		if (rising_edge(clk)) then
-			-- Reset
-			if (reset = '0') then
-				pc_out <= std_logic_vector(to_unsigned(0, PC_WIDTH));
-				next_counter <= std_logic_vector(to_unsigned(0, PC_WIDTH));
-			end if;
-
+		-- Reset
+		if (reset = '0') then
+			pc_out <= std_logic_vector(to_unsigned(0, PC_WIDTH));
+			next_counter <= std_logic_vector(to_unsigned(0, PC_WIDTH));
+		-- Synchronous part
+		elsif (rising_edge(clk)) then
 			-- Stall the pipeline
 			if (stall = '0') then
 				-- If pcsrc is asserted, use pc_in as the new counter
