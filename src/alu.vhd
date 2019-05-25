@@ -95,7 +95,7 @@ begin
 				end if;
 
 			when others =>
-				if (A = (others=>'0')) then
+				if (A = (DATA_WIDTH-1 downto 0 => '0')) then
 					Z <= '1';
 				else
 					Z <= '0';
