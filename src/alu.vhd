@@ -22,7 +22,7 @@ architecture rtl of alu is
 begin
 
 	-- Process to determine the result output depending on the desired operation
-	result : process(op)
+	result : process(all)
 	begin
 		case op is
 			when ALU_NOP =>
@@ -48,13 +48,13 @@ begin
 				end if;
 
 			when ALU_SLL =>
-				R <= std_logic_vector(shift_left(unsigned(B), to_integer(unsigned(A))));
+				R <= std_logic_vector(shift_left(unsigned(B), to_integer(unsigned(A(DATA_WIDTH_BITS-1 downto 0)))));
 
 			when ALU_SRL =>
-				R <= std_logic_vector(shift_right(unsigned(B), to_integer(unsigned(A))));
+				R <= std_logic_vector(shift_right(unsigned(B), to_integer(unsigned(A(DATA_WIDTH_BITS-1 downto 0)))));
 
 			when ALU_SRA =>
-				R <= std_logic_vector(shift_right(signed(B), to_integer(unsigned(A))));
+				R <= std_logic_vector(shift_right(signed(B), to_integer(unsigned(A(DATA_WIDTH_BITS-1 downto 0)))));
 
 			when ALU_ADD =>
 				R <= std_logic_vector(signed(A) + signed(B));
@@ -83,7 +83,7 @@ begin
 	end process;
 
 	-- Process to determine the state of the zero bit
-	zero : process(op)
+	zero : process(all)
 	begin
 		case op is
 
@@ -106,7 +106,7 @@ begin
 	end process;
 
   -- Process to determine the state of the overflow bit
-	overflow : process(op, calc)
+	overflow : process(all)
 	begin
 		case op is
 
