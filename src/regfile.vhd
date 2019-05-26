@@ -18,12 +18,13 @@ end regfile;
 architecture rtl of regfile is
 	type reg_t is array(2**REG_BITS-1 downto 0) of std_logic_vector(DATA_WIDTH-1 downto 0);
 	signal reg : reg_t;
+	constant reg_clear : reg_t := (others => (others => '0'));
 begin  -- rtl
 	-- one-process-method becouse of the hint in the assignment to use the implementation guidelines
 	sync : process(clk, reset)
 	begin
 		if reset = '0' then
-			reg <= (others => (0 to DATA_WIDTH-1 => '0'));
+			reg <= reg_clear;
 		elsif rising_edge(clk) then
 			-- write to register
 			if regwrite = '1' and stall = '0' then
