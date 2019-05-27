@@ -98,8 +98,10 @@ begin  -- rtl
 								exec_op.aluop <= ALU_SRA;
 							when "001000" => -- JR
 								jmp_op <= JMP_JMP;
+								exec_op.regdst <= '1';
 							when "001001" => -- JALR
 								jmp_op <= JMP_JMP;
+								exec_op.regdst <= '1';
 								exec_op.link <= '1';
 								wb_op.regwrite <= '0';
 							when "100000" => -- ADD
@@ -213,7 +215,6 @@ begin  -- rtl
 						case rd_r is
 							when "00000" => -- MFC0
 								exec_op.cop0 <= '1';
-								exec_op.regdst <= '1';
 								cop0_op.addr <= rd_r;
 								wb_op.regwrite <= '1';
 							when "00100" => -- MTC0
