@@ -27,6 +27,9 @@ begin  -- rtl
 		AA := W(BYTE_WIDTH-1 downto 0);
 		XX := (others => '-');
 
+		M.byteena <= (others => '0');
+		M.wrdata <= (others => '0');
+
 		case op.memtype is
 			when MEM_B | MEM_BU =>
 				case A(1 downto 0) is
@@ -76,6 +79,8 @@ begin  -- rtl
 		AA := D(BYTE_WIDTH-1 downto 0);
 		SS := (others => '0');
 		zero := (others => '0');
+
+		R <= (others => '0');
 
 		case op.memtype is
 			when MEM_B =>
@@ -146,7 +151,7 @@ begin  -- rtl
 		XL <= '0';
 		XS <= '0';
 
-		if (op.memread = '1' and A(1 downto 0) = "00" 		and  A(ADDR_WIDTH-1 downto 2) = (ADDR_WIDTH-3 downto 0 => '0')) 		or
+		if (op.memread = '1' and A = (0 to ADDR_WIDTH-1 => '0')) 		or
 			 (op.memread = '1' and op.memtype 	 = MEM_H 		and (A(1 downto 0) = "01" or A(1 downto 0) = "11")) or
 			 (op.memread = '1' and op.memtype 	 = MEM_HU		and (A(1 downto 0) = "01" or A(1 downto 0) = "11")) or
 			 (op.memread = '1' and op.memtype 	 = MEM_W	 	and (A(1 downto 0) = "01" or A(1 downto 0) = "10" 	or A(1 downto 0) = "11")) then
@@ -155,7 +160,7 @@ begin  -- rtl
 				 M.wr <= '0';
 		end if;
 
-		if (op.memwrite = '1' and A(1 downto 0) = "00"		and  A(ADDR_WIDTH-1 downto 2) = (ADDR_WIDTH-3 downto 0 => '0'))		or
+		if (op.memwrite = '1' and A = (0 to ADDR_WIDTH-1 => '0'))		or
 			 (op.memwrite = '1' and op.memtype 		= MEM_H		and (A(1 downto 0) = "01" or A(1 downto 0) = "11")) or
 			 (op.memwrite = '1' and op.memtype 		= MEM_HU 	and (A(1 downto 0) = "01" or A(1 downto 0) = "11")) or
 			 (op.memwrite = '1' and op.memtype 		= MEM_W 	and (A(1 downto 0) = "01" or A(1 downto 0) = "10" 	or A(1 downto 0) = "11")) then
