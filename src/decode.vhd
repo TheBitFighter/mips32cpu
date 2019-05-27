@@ -103,7 +103,7 @@ begin  -- rtl
 								jmp_op <= JMP_JMP;
 								exec_op.regdst <= '1';
 								exec_op.link <= '1';
-								wb_op.regwrite <= '0';
+								wb_op.regwrite <= '1';
 							when "100000" => -- ADD
 								exec_op.aluop <= ALU_ADD;
 							when "100001" => -- ADDU
