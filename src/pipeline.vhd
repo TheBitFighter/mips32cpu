@@ -229,7 +229,7 @@ begin  -- rtl
 			neg => exec_neg,
 			pcsrc => mem_pcsrc,
 			new_pc_in => exec_new_pc,
-			new_pc_out => mem_pc_out,
+			new_pc_out => mem_new_pc_out,
 			pc_in => exec_pc_out,
 			pc_out => mem_pc_out,
 			rd_in => exec_rd,
