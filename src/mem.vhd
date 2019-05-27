@@ -71,11 +71,7 @@ begin  -- rtl
 			memresult <= (others => '0');
 			new_pc_out <= (others => '0');
 			wbop_out <= WB_NOP;
-			mem_out.address <= (others => '0');
-			mem_out.rd <= '0';
-			mem_out.wr <= '0';
-			mem_out.byteena <= (others => '0');
-			mem_out.wrdata <= (others => '0');
+			mem_out <= MEM_OUT_NOP;
 			exc_load <= '0';
 			exc_store <= '0';
 		elsif rising_edge(clk) then
@@ -90,9 +86,6 @@ begin  -- rtl
 				mem_out <= mem_out_reg;
 				exc_load <= exc_load_reg;
 				exc_store <= exc_store_reg;
-			else
-				mem_out.rd <= '0';
-				mem_out.wr <= '0';
 			end if;
 			if flush = '1' then
 				pc_out <= (others => '0');
@@ -102,11 +95,7 @@ begin  -- rtl
 				memresult <= (others => '0');
 				new_pc_out <= (others => '0');
 				wbop_out <= WB_NOP;
-				mem_out.address <= (others => '0');
-				mem_out.rd <= '0';
-				mem_out.wr <= '0';
-				mem_out.byteena <= (others => '0');
-				mem_out.wrdata <= (others => '0');
+				mem_out <= MEM_OUT_NOP;
 				exc_load <= '0';
 				exc_store <= '0';
 			end if;

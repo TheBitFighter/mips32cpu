@@ -84,13 +84,13 @@ begin
     mem_data <= (others => '0');
 
     wait for CLK_PERIOD/2 * 5;
-    reset <= '1';
 
     wait for CLK_PERIOD*2;
     pc_in <= (others => '1');
-    wait for CLK_PERIOD;
     mem_op.memtype <= MEM_B;
     mem_op.memread <= '1';
+    wait for CLK_PERIOD;
+    reset <= '1';
 
     wait for CLK_PERIOD;
     pc_in <= (0 => '0', others => '1');
