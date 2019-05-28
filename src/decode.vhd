@@ -74,7 +74,6 @@ begin  -- rtl
 				exec_op.rs <= rs;
 				exec_op.rt <= rt;
 				exec_op.rd <= rd_r;
-				exec_op.shamt <= shamt;
 				exec_op.imm <= (16 to DATA_WIDTH-1 => address_immediate(15)) & address_immediate;
 
 				case opcode is
@@ -83,12 +82,15 @@ begin  -- rtl
 						case func is
 							when "000000" => -- SLL
 								exec_op.aluop <= ALU_SLL;
+								exec_op.readdata1 <= (0 to DATA_WIDTH-6 => '0') & shamt;
 								exec_op.useamt <= '1';
 							when "000010" => -- SRL
 								exec_op.aluop <= ALU_SRL;
+								exec_op.readdata1 <= (0 to DATA_WIDTH-6 => '0') & shamt;
 								exec_op.useamt <= '1';
 							when "000011" => -- SRA
 								exec_op.aluop <= ALU_SRA;
+								exec_op.readdata1 <= (0 to DATA_WIDTH-6 => '0') & shamt;
 								exec_op.useamt <= '1';
 							when "000100" => -- SLLV
 								exec_op.aluop <= ALU_SLL;
@@ -142,12 +144,14 @@ begin  -- rtl
 							when "10000" => -- BLTZAL
 								exec_op.aluop <= ALU_SLT;
 								exec_op.link <= '1';
+								exec_op.rd <= (others => '0'); -- r31
 								exec_op.branch <= '1';
 								jmp_op <= JMP_BLTZ;
 								wb_op.regwrite <= '1';
 							when "10001" => -- BGEZAL
 								exec_op.aluop <= ALU_SLT;
 								exec_op.link <= '1';
+								exec_op.rd <= (others => '0'); -- r31
 								exec_op.branch <= '1';
 								jmp_op <= JMP_BGEZ;
 								wb_op.regwrite <= '1';
@@ -160,6 +164,7 @@ begin  -- rtl
 					when "000011" => -- JAL
 						exec_op.useimm <= '1';
 						exec_op.link <= '1';
+						exec_op.rd <= (others => '0'); -- r31
 						jmp_op <= JMP_JMP;
 						wb_op.regwrite <= '1';
 					when "000100" => -- BEQ
