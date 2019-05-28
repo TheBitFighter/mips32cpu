@@ -73,8 +73,12 @@ begin  -- rtl
 				exec_op.readdata2 <= rddata2;
 				exec_op.rs <= rs;
 				exec_op.rt <= rt;
-				exec_op.rd <= rd_r;
 				exec_op.imm <= (16 to DATA_WIDTH-1 => address_immediate(15)) & address_immediate;
+				if opcode = "000000" or opcode = "010000" then
+					exec_op.rd <= rd_r;
+				else
+					exec_op.rd <= rd_i;
+				end if;
 
 				case opcode is
 					when "000000" => -- MiMi special instruction
