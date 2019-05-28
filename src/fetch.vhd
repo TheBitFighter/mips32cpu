@@ -29,7 +29,7 @@ begin
 	begin
 		-- Reset
 		if (reset = '0') then
-			pc_out <= std_logic_vector(to_signed(-4, PC_WIDTH));
+			pc_out <= std_logic_vector(to_signed(0, PC_WIDTH)); -- 0 or -4, tests needed
 		-- Synchronous part
 		elsif (rising_edge(clk)) then
 			-- Stall the pipeline
