@@ -36,6 +36,17 @@ end exec;
 
 architecture rtl of exec is
 
+	-- Alu component definition
+	component alu is
+		port (
+			op   : in  alu_op_type;
+			A, B : in  std_logic_vector(DATA_WIDTH-1 downto 0);
+			R    : out std_logic_vector(DATA_WIDTH-1 downto 0);
+			Z    : out std_logic;
+			V    : out std_logic
+		);
+	end component;
+
 	constant nop_instr : exec_op_type := (
 		aluop => ALU_NOP,
 		readdata1 => (others=>'0'),
@@ -83,7 +94,7 @@ begin
 			if (stall = '0') then
 					if (flush = '1') then
 						-- Flush the operation registers
-						current_op.aluop <= nop_instr;
+						current_op <= nop_instr;
 					else
 						current_op <= op;
 					end if;
@@ -103,18 +114,18 @@ begin
 			aluresult <= cop0_rddata;
 			new_pc <= (others=>'0');
 		-- Check for a branch instruction
-		elsif (branch = '1') then
+		elsif (current_op.branch = '1') then
 			aluresult <= adder_inter;
 			new_pc <= adder_inter(PC_WIDTH-1 downto 0);
 		-- Check if the pc should be used for output
-		elsif (link = 1) then
-			aluresult <= '0' & pc_in;
+		elsif (current_op.link = '1') then
+			aluresult <= (DATA_WIDTH-1 downto pc_in'length => '0') & pc_in;
 			new_pc <= pc_in;
 		-- Check if a jump jump instruction was issued
-		elsif (jmp_op = JMP_JMP and current_op.regdst = '0') then
+		elsif (jmpop_in = JMP_JMP and current_op.regdst = '0') then
 			aluresult <= std_logic_vector(shift_left(unsigned(current_op.imm), 2));
-			new_pc <= std_logic_vector(shift_left(unsigned(current_op.imm), 2))(PC_WIDTH-1 downto 0);
-		elsif (jmp_op = JMP_JMP and current_op.regdst = '1') then
+			new_pc <= std_logic_vector(shift_left(unsigned(current_op.imm), 2));
+		elsif (jmpop_in = JMP_JMP and current_op.regdst = '1') then
 			aluresult <= current_op.readdata1;
 			new_pc <= current_op.readdata1(PC_WIDTH-1 downto 0);
 		-- Otherwise the alu output will be used
@@ -132,7 +143,8 @@ begin
 
 	-- Set the alu inputs as needed
 	alu_in : process(current_op)
-		if (useimm = '0') then
+	begin
+		if (current_op.useimm = '0') then
 			second_operator <= current_op.readdata2;
 		else
 			second_operator <= std_logic_vector(shift_left(signed(current_op.imm), 2));
@@ -141,9 +153,8 @@ begin
 
 	-- Adder for the new pc
 	adder : process(current_op)
-		adder_inter <= std_logic_vector(unsigned(pc_in) + shift_left(signed(current_op.imm), 2) - 4);
 	begin
-
+		adder_inter <= std_logic_vector(to_unsigned(to_integer(unsigned(pc_in)) + to_integer(shift_left(signed(current_op.imm), 2)) - 4, DATA_WIDTH));
 	end process;
 
 	alu_inst : alu
