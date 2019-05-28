@@ -17,7 +17,7 @@ end alu;
 
 architecture rtl of alu is
 
-	signal calc : std_logic_vector(DATA_WIDTH-1 downto 0);
+	signal calc : std_logic_vector(DATA_WIDTH-1 downto 0) := (others => '0');
 
 begin
 
