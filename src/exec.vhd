@@ -147,7 +147,7 @@ begin
 		if (current_op.useimm = '0') then
 			second_operator <= current_op.readdata2;
 		else
-			second_operator <= std_logic_vector(shift_left(signed(current_op.imm), 2));
+			second_operator <= current_op.imm;
 		end if;
 	end process;
 
