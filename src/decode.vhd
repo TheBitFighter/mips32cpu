@@ -74,7 +74,11 @@ begin  -- rtl
 				exec_op.rs <= rs;
 				exec_op.rt <= rt;
 				exec_op.imm <= (16 to DATA_WIDTH-1 => address_immediate(15)) & address_immediate;
+<<<<<<< HEAD
 				if opcode = "000000" or opcode = "010000" then
+=======
+				if opcode = "000000" or "010000" then
+>>>>>>> ec3458e06e12286869aab91f5cf4ddb9be0f6450
 					exec_op.rd <= rd_r;
 				else
 					exec_op.rd <= rd_i;
