@@ -28,7 +28,7 @@ package op_pack is
 		readdata2  : std_logic_vector(DATA_WIDTH-1 downto 0);
 		imm        : std_logic_vector(DATA_WIDTH-1 downto 0);
 		rs, rt, rd : std_logic_vector(REG_BITS-1 downto 0);
-		useadd     : std_logic;
+		useimm     : std_logic;
 		useamt     : std_logic;
 		link       : std_logic;
 		branch     : std_logic;

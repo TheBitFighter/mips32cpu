@@ -52,8 +52,10 @@ architecture rtl of exec is
 		cop0 => '0',
 		ovf => '0'
 	);
-	signal alu_intermediate : std_logic_vector(DATA_WIDTH-1 downto 0);
+	signal alu_inter, adder_inter : std_logic_vector(DATA_WIDTH-1 downto 0);
 	signal current_op : exec_op_type;
+	signal second_operator : std_logic_vector(DATA_WIDTH-1 downto 0);
+	signal exc_ovf_int, zero_int : std_logic;
 
 begin
 
@@ -69,7 +71,7 @@ begin
 	wbop_out <= wbop_in;
 
 	-- Synchronous Process
-	input : process(clk)
+	latch : process(clk)
 	begin
 		-- Asynchronous reset
 		if (reset = '0') then
@@ -89,19 +91,57 @@ begin
 		end if;
 	end process;
 
-	exec : process(current_op)
+	-- Control the aluresult output
+	output : process(current_op)
 	begin
+		-- Set the alu flags to 0 by default
+		neg <= '0';
+		zero <= '0';
+		exc_ovf <= '0';
+		-- Check for a cop0 instruction
 		if (current_op.cop0 = '1') then
 			aluresult <= cop0_rddata;
-		elsif (current_op.useadd = '1'
-				and alu_intermediate(DATA_WIDTH-1) = '1') then
-			
+			new_pc <= (others=>'0');
+		-- Check for a branch instruction
+		elsif (branch = '1') then
+			aluresult <= adder_inter;
+			new_pc <= adder_inter(PC_WIDTH-1 downto 0);
+		-- Check if the pc should be used for output
+		elsif (link = 1) then
+			aluresult <= '0' & pc_in;
+			new_pc <= pc_in;
+		-- Check if a jump jump instruction was issued
+		elsif (jmp_op = JMP_JMP and current_op.regdst = '0') then
+			aluresult <= std_logic_vector(shift_left(unsigned(current_op.imm), 2));
+			new_pc <= std_logic_vector(shift_left(unsigned(current_op.imm), 2))(PC_WIDTH-1 downto 0);
+		elsif (jmp_op = JMP_JMP and current_op.regdst = '1') then
+			aluresult <= current_op.readdata1;
+			new_pc <= current_op.readdata1(PC_WIDTH-1 downto 0);
+		-- Otherwise the alu output will be used
 		else
-			aluresult <= alu_intermediate;
+			aluresult <= alu_inter;
+			new_pc <= (others=>'0');
+			-- Check if the alu flags should be adjusted
+			if (alu_inter(DATA_WIDTH-1) = '1') then
+				neg <= '1';
+			end if;
+			zero <= zero_int;
+			exc_ovf <= exc_ovf_int;
 		end if;
 	end process;
 
-	adder : process(current_op.useadd)
+	-- Set the alu inputs as needed
+	alu_in : process(current_op)
+		if (useimm = '0') then
+			second_operator <= current_op.readdata2;
+		else
+			second_operator <= std_logic_vector(shift_left(signed(current_op.imm), 2));
+		end if;
+	end process;
+
+	-- Adder for the new pc
+	adder : process(current_op)
+		adder_inter <= std_logic_vector(unsigned(pc_in) + shift_left(signed(current_op.imm), 2) - 4);
 	begin
 
 	end process;
@@ -110,10 +150,10 @@ begin
 	port map (
 		op => current_op.aluop,
 		A => current_op.readdata1,
-		B => current_op.readdata2,
-		R => alu_intermediate,
-		Z => zero,
-		V => exc_ovf
+		B => second_operator,
+		R => alu_inter,
+		Z => zero_int,
+		V => exc_ovf_int
 	);
 
 end rtl;
