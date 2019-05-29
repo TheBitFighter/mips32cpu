@@ -75,12 +75,6 @@ begin
 	rd <= current_op.rd;
 	rt <= current_op.rt;
 
-	-- Forward signals
-	pc_out <= pc_in;
-	memop_out <= memop_in;
-	jmpop_out <= jmpop_in;
-	wbop_out <= wbop_in;
-
 	-- Synchronous Process
 	latch : process(clk)
 	begin
@@ -98,6 +92,13 @@ begin
 					else
 						current_op <= op;
 					end if;
+
+					-- Forward signals
+					pc_out <= pc_in;
+					memop_out <= memop_in;
+					jmpop_out <= jmpop_in;
+					wbop_out <= wbop_in;
+
 			end if;
 		end if;
 	end process;
@@ -112,32 +113,31 @@ begin
 		-- Check for a cop0 instruction
 		if (current_op.cop0 = '1') then
 			aluresult <= cop0_rddata;
-			new_pc <= (others=>'0');
-		-- Check for a branch instruction
-		elsif (current_op.branch = '1') then
-			aluresult <= adder_inter;
-			new_pc <= adder_inter(PC_WIDTH-1 downto 0);
 		-- Check if the pc should be used for output
 		elsif (current_op.link = '1') then
 			aluresult <= (DATA_WIDTH-1 downto pc_in'length => '0') & pc_in;
-			new_pc <= pc_in;
-		-- Check if a jump jump instruction was issued
-		elsif (jmpop_in = JMP_JMP and current_op.regdst = '0') then
-			aluresult <= std_logic_vector(shift_left(unsigned(current_op.imm), 2));
-			new_pc <= std_logic_vector(shift_left(unsigned(current_op.imm), 2));
-		elsif (jmpop_in = JMP_JMP and current_op.regdst = '1') then
-			aluresult <= current_op.readdata1;
-			new_pc <= current_op.readdata1(PC_WIDTH-1 downto 0);
 		-- Otherwise the alu output will be used
 		else
 			aluresult <= alu_inter;
-			new_pc <= (others=>'0');
 			-- Check if the alu flags should be adjusted
 			if (alu_inter(DATA_WIDTH-1) = '1') then
 				neg <= '1';
 			end if;
 			zero <= zero_int;
 			exc_ovf <= exc_ovf_int;
+		end if;
+
+		-- Route the new_pc output
+		-- Check for a branch instruction
+		if (current_op.branch = '1') then
+			new_pc <= adder_inter(PC_WIDTH-1 downto 0);
+		-- Check if a jump jump instruction was issued
+		elsif (jmpop_in = JMP_JMP and current_op.regdst = '0') then
+			new_pc <= std_logic_vector(shift_left(unsigned(current_op.imm), 2));
+		elsif (jmpop_in = JMP_JMP and current_op.regdst = '1') then
+			new_pc <= current_op.readdata1(PC_WIDTH-1 downto 0);
+		else
+			new_pc <= (others=>'0');
 		end if;
 	end process;
 
