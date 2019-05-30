@@ -127,7 +127,7 @@ begin
 			aluresult <= cop0_rddata;
 		-- Check if the pc should be used for output
 		elsif (current_op.link = '1') then
-			aluresult <= (DATA_WIDTH-1 downto pc_in'length => '0') & pc_in;
+			aluresult <= (DATA_WIDTH-1 downto pc_out'length => '0') & pc_out;
 		-- Otherwise the alu output will be used
 		else
 			aluresult <= alu_inter;
@@ -144,9 +144,9 @@ begin
 		if (current_op.branch = '1') then
 			new_pc <= adder_inter(PC_WIDTH-1 downto 0);
 		-- Check if a jump jump instruction was issued
-		elsif (jmpop_in = JMP_JMP and current_op.regdst = '0') then
+	elsif (jmpop_out = JMP_JMP and current_op.regdst = '0') then
 			new_pc <= current_op.imm(PC_WIDTH-3 downto 0) & "00";
-		elsif (jmpop_in = JMP_JMP and current_op.regdst = '1') then
+		elsif (jmpop_out = JMP_JMP and current_op.regdst = '1') then
 			new_pc <= current_op.readdata1(PC_WIDTH-1 downto 0);
 		else
 			new_pc <= (others=>'0');
@@ -168,7 +168,7 @@ begin
 	-- Adder for the new pc
 	adder : process(all)
 	begin
-		adder_inter <= std_logic_vector(to_unsigned(to_integer(unsigned(pc_in)) + to_integer(shift_left(signed(current_op.imm), 2)) - 4, DATA_WIDTH));
+		adder_inter <= std_logic_vector(to_unsigned(to_integer(unsigned(pc_out)) + to_integer(shift_left(signed(current_op.imm), 2)) - 4, DATA_WIDTH));
 	end process;
 
 	alu_inst : alu
