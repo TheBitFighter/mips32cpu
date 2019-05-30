@@ -85,9 +85,9 @@ begin
 
 			-- Reset forward signals
 			pc_out <= (others=>'0');
-			memop_out <= (others=>'0');
-			jmpop_out <= (others=>'0');
-			wbop_out <= (others=>'0');
+			memop_out <= MEM_NOP;
+			jmpop_out <= JMP_NOP;
+			wbop_out <= WB_NOP;
 
 		elsif (rising_edge(clk)) then
 			-- Stall the pipeline
@@ -98,18 +98,18 @@ begin
 
 						-- Reset forward signals
 						pc_out <= (others=>'0');
-						memop_out <= (others=>'0');
-						jmpop_out <= (others=>'0');
-						wbop_out <= (others=>'0');
+						memop_out <= MEM_NOP;
+						jmpop_out <= JMP_NOP;
+						wbop_out <= WB_NOP;
 					else
 						current_op <= op;
+						-- Forward signals
+						pc_out <= pc_in;
+						memop_out <= memop_in;
+						jmpop_out <= jmpop_in;
+						wbop_out <= wbop_in;
 					end if;
 
-					-- Forward signals
-					pc_out <= pc_in;
-					memop_out <= memop_in;
-					jmpop_out <= jmpop_in;
-					wbop_out <= wbop_in;
 
 			end if;
 		end if;
@@ -145,7 +145,7 @@ begin
 			new_pc <= adder_inter(PC_WIDTH-1 downto 0);
 		-- Check if a jump jump instruction was issued
 		elsif (jmpop_in = JMP_JMP and current_op.regdst = '0') then
-			new_pc <= std_logic_vector(shift_left(unsigned(current_op.imm), 2));
+			new_pc <= current_op.imm(PC_WIDTH-3 downto 0) & "00";
 		elsif (jmpop_in = JMP_JMP and current_op.regdst = '1') then
 			new_pc <= current_op.readdata1(PC_WIDTH-1 downto 0);
 		else
