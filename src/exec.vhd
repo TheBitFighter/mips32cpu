@@ -92,25 +92,22 @@ begin
 		elsif (rising_edge(clk)) then
 			-- Stall the pipeline
 			if (stall = '0') then
-					if (flush = '1') then
-						-- Flush the operation registers
-						current_op <= nop_instr;
+				current_op <= op;
+				-- Forward signals
+				pc_out <= pc_in;
+				memop_out <= memop_in;
+				jmpop_out <= jmpop_in;
+				wbop_out <= wbop_in;
+			end if;
+			if (flush = '1') then
+				-- Flush the operation registers
+				current_op <= nop_instr;
 
-						-- Reset forward signals
-						pc_out <= (others=>'0');
-						memop_out <= MEM_NOP;
-						jmpop_out <= JMP_NOP;
-						wbop_out <= WB_NOP;
-					else
-						current_op <= op;
-						-- Forward signals
-						pc_out <= pc_in;
-						memop_out <= memop_in;
-						jmpop_out <= jmpop_in;
-						wbop_out <= wbop_in;
-					end if;
-
-
+				-- Reset forward signals
+				pc_out <= (others=>'0');
+				memop_out <= MEM_NOP;
+				jmpop_out <= JMP_NOP;
+				wbop_out <= WB_NOP;
 			end if;
 		end if;
 	end process;
