@@ -76,12 +76,18 @@ begin
 	rt <= current_op.rt;
 
 	-- Synchronous Process
-	latch : process(clk)
+	latch : process(clk, reset)
 	begin
 		-- Asynchronous reset
 		if (reset = '0') then
 
 			current_op <= nop_instr;
+
+			-- Reset forward signals
+			pc_out <= (others=>'0');
+			memop_out <= (others=>'0');
+			jmpop_out <= (others=>'0');
+			wbop_out <= (others=>'0');
 
 		elsif (rising_edge(clk)) then
 			-- Stall the pipeline
@@ -89,6 +95,12 @@ begin
 					if (flush = '1') then
 						-- Flush the operation registers
 						current_op <= nop_instr;
+
+						-- Reset forward signals
+						pc_out <= (others=>'0');
+						memop_out <= (others=>'0');
+						jmpop_out <= (others=>'0');
+						wbop_out <= (others=>'0');
 					else
 						current_op <= op;
 					end if;
@@ -104,7 +116,7 @@ begin
 	end process;
 
 	-- Control the aluresult output
-	output : process(current_op)
+	output : process(all)
 	begin
 		-- Set the alu flags to 0 by default
 		neg <= '0';
@@ -139,10 +151,12 @@ begin
 		else
 			new_pc <= (others=>'0');
 		end if;
+
+		wrdata <= (others=>'0');
 	end process;
 
 	-- Set the alu inputs as needed
-	alu_in : process(current_op)
+	alu_in : process(all)
 	begin
 		if (current_op.useimm = '0') then
 			second_operator <= current_op.readdata2;
@@ -152,7 +166,7 @@ begin
 	end process;
 
 	-- Adder for the new pc
-	adder : process(current_op)
+	adder : process(all)
 	begin
 		adder_inter <= std_logic_vector(to_unsigned(to_integer(unsigned(pc_in)) + to_integer(shift_left(signed(current_op.imm), 2)) - 4, DATA_WIDTH));
 	end process;
