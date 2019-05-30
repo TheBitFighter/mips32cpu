@@ -124,7 +124,7 @@ begin
 			aluresult <= cop0_rddata;
 		-- Check if the pc should be used for output
 		elsif (current_op.link = '1') then
-			aluresult <= (DATA_WIDTH-1 downto pc_out'length => '0') & pc_out;
+			aluresult <= (pc_out'length to DATA_WIDTH-1 => '0') & pc_out;
 		-- Otherwise the alu output will be used
 		else
 			aluresult <= alu_inter;
