@@ -30,7 +30,7 @@ begin  -- rtl
 			rd_out <= (others => '0');
 			result <= (others => '0');
 			regwrite <= '0';
-		elsif rising_edge(clk) then
+		else--if rising_edge(clk) then
 			if stall = '0' then
 				regwrite <= op.regwrite;
 				rd_out <= rd_in;
