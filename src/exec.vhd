@@ -115,10 +115,12 @@ begin
 	-- Control the aluresult output
 	output : process(all)
 	begin
-		-- Set the alu flags to 0 by default
 		neg <= '0';
-		zero <= '0';
-		exc_ovf <= '0';
+		if (alu_inter(DATA_WIDTH-1) = '1') then
+			neg <= '1';
+		end if;
+		zero <= zero_int;
+		exc_ovf <= exc_ovf_int;
 		-- Check for a cop0 instruction
 		if (current_op.cop0 = '1') then
 			aluresult <= cop0_rddata;
@@ -129,11 +131,6 @@ begin
 		else
 			aluresult <= alu_inter;
 			-- Check if the alu flags should be adjusted
-			if (alu_inter(DATA_WIDTH-1) = '1') then
-				neg <= '1';
-			end if;
-			zero <= zero_int;
-			exc_ovf <= exc_ovf_int;
 		end if;
 
 		-- Route the new_pc output
