@@ -204,22 +204,27 @@ begin  -- rtl
 						exec_op.aluop <= ALU_SLTU;
 						exec_op.useimm <= '1';
 						wb_op.regwrite <= '1';
+						exec_op.imm <= (16 to DATA_WIDTH-1 => '0') & address_immediate;
 					when "001100" => -- ANDI
 						exec_op.aluop <= ALU_AND;
 						exec_op.useimm <= '1';
 						wb_op.regwrite <= '1';
+						exec_op.imm <= (16 to DATA_WIDTH-1 => '0') & address_immediate;
 					when "001101" => -- ORI
 						exec_op.aluop <= ALU_OR;
 						exec_op.useimm <= '1';
 						wb_op.regwrite <= '1';
+						exec_op.imm <= (16 to DATA_WIDTH-1 => '0') & address_immediate;
 					when "001110" => -- XORI
 						exec_op.aluop <= ALU_XOR;
 						exec_op.useimm <= '1';
 						wb_op.regwrite <= '1';
+						exec_op.imm <= (16 to DATA_WIDTH-1 => '0') & address_immediate;
 					when "001111" => -- LUI;
 						exec_op.aluop <= ALU_LUI;
 						exec_op.useimm <= '1';
 						wb_op.regwrite <= '1';
+						exec_op.imm <= (16 to DATA_WIDTH-1 => '0') & address_immediate;
 					when "010000" => -- MiMi cop0 instructions
 						case rd_r is
 							when "00000" => -- MFC0
