@@ -127,7 +127,7 @@ begin  -- rtl
 							when "100110" => -- XOR
 								exec_op.aluop <= ALU_XOR;
 							when "100111" => -- NOR
-								exec_op.aluop <= ALU_XOR;
+								exec_op.aluop <= ALU_NOR;
 							when "101010" => -- SLT
 								exec_op.aluop <= ALU_SLT;
 							when "101011" => -- SLTU
