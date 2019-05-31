@@ -126,7 +126,7 @@ begin
 			aluresult <= cop0_rddata;
 		-- Check if the pc should be used for output
 		elsif (current_op.link = '1') then
-			aluresult <= (pc_out'length to DATA_WIDTH-1 => '0') & pc_out;
+			aluresult <= (pc_out'length to DATA_WIDTH-1 => '0') & std_logic_vector(signed(pc_out)+ 4);--pc_out;
 		-- Otherwise the alu output will be used
 		else
 			aluresult <= alu_inter;
@@ -162,7 +162,7 @@ begin
 	-- Adder for the new pc
 	adder : process(all)
 	begin
-		adder_inter <= std_logic_vector(signed(pc_out) - 4 + shift_left(signed(current_op.imm), 2));
+		adder_inter <= std_logic_vector(signed(pc_out) + shift_left(signed(current_op.imm), 2));
 	end process;
 
 	alu_inst : alu
