@@ -138,27 +138,31 @@ begin  -- rtl
 					when "000001" => -- MiMi regimm instructions
 						case rd_i is
 							when "00000" => -- BLTZ
-								exec_op.aluop <= ALU_SLT;
+								exec_op.aluop <= ALU_SUB;
 								exec_op.branch <= '1';
 								jmp_op <= JMP_BLTZ;
+								exec_op.readdata2 <= (others => '0');
 							when "00001" => -- BGEZ
-								exec_op.aluop <= ALU_SLT;
+								exec_op.aluop <= ALU_SUB;
 								exec_op.branch <= '1';
 								jmp_op <= JMP_BGEZ;
+								exec_op.readdata2 <= (others => '0');
 							when "10000" => -- BLTZAL
-								exec_op.aluop <= ALU_SLT;
+								exec_op.aluop <= ALU_SUB;
 								exec_op.link <= '1';
 								exec_op.rd <= (others => '1'); -- r31
 								exec_op.branch <= '1';
 								jmp_op <= JMP_BLTZ;
 								wb_op.regwrite <= '1';
+								exec_op.readdata2 <= (others => '0');
 							when "10001" => -- BGEZAL
-								exec_op.aluop <= ALU_SLT;
+								exec_op.aluop <= ALU_SUB;
 								exec_op.link <= '1';
 								exec_op.rd <= (others => '1'); -- r31
 								exec_op.branch <= '1';
 								jmp_op <= JMP_BGEZ;
 								wb_op.regwrite <= '1';
+								exec_op.readdata2 <= (others => '0');
 							when others =>
 								exc_dec <= '1';
 						end case;
@@ -180,13 +184,15 @@ begin  -- rtl
 						exec_op.branch <= '1';
 						jmp_op <= JMP_BNE;
 					when "000110" => -- BLEZ
-						exec_op.aluop <= ALU_SLT;
+						exec_op.aluop <= ALU_SUB;
 						exec_op.branch <= '1';
 						jmp_op <= JMP_BLEZ;
+						exec_op.readdata2 <= (others => '0');
 					when "000111" => -- BGTZ
-						exec_op.aluop <= ALU_SLT;
+						exec_op.aluop <= ALU_SUB;
 						exec_op.branch <= '1';
 						jmp_op <= JMP_BGTZ;
+						exec_op.readdata2 <= (others => '0');
 					when "001000" => -- ADDI
 						exec_op.aluop <= ALU_ADD;
 						exec_op.useimm <= '1';
