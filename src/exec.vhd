@@ -162,7 +162,7 @@ begin
 	-- Adder for the new pc
 	adder : process(all)
 	begin
-		adder_inter <= std_logic_vector(to_unsigned(to_integer(unsigned(pc_out)) + to_integer(shift_left(signed(current_op.imm), 2)) - 4, DATA_WIDTH));
+		adder_inter <= std_logic_vector(signed(pc_out) - 4 + shift_left(signed(current_op.imm), 2));
 	end process;
 
 	alu_inst : alu
