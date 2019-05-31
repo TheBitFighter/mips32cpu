@@ -105,7 +105,7 @@ begin  -- rtl
 							when "001000" => -- JR
 								jmp_op <= JMP_JMP;
 								exec_op.regdst <= '1';
-								wb_op.regwrite <= '0'
+								wb_op.regwrite <= '0';
 							when "001001" => -- JALR
 								jmp_op <= JMP_JMP;
 								exec_op.regdst <= '1';
