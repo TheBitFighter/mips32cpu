@@ -148,14 +148,14 @@ begin  -- rtl
 							when "10000" => -- BLTZAL
 								exec_op.aluop <= ALU_SLT;
 								exec_op.link <= '1';
-								exec_op.rd <= (others => '0'); -- r31
+								exec_op.rd <= (others => '1'); -- r31
 								exec_op.branch <= '1';
 								jmp_op <= JMP_BLTZ;
 								wb_op.regwrite <= '1';
 							when "10001" => -- BGEZAL
 								exec_op.aluop <= ALU_SLT;
 								exec_op.link <= '1';
-								exec_op.rd <= (others => '0'); -- r31
+								exec_op.rd <= (others => '1'); -- r31
 								exec_op.branch <= '1';
 								jmp_op <= JMP_BGEZ;
 								wb_op.regwrite <= '1';
@@ -168,7 +168,7 @@ begin  -- rtl
 					when "000011" => -- JAL
 						exec_op.useimm <= '1';
 						exec_op.link <= '1';
-						exec_op.rd <= (others => '0'); -- r31
+						exec_op.rd <= (others => '1'); -- r31
 						jmp_op <= JMP_JMP;
 						wb_op.regwrite <= '1';
 					when "000100" => -- BEQ
