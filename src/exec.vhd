@@ -146,7 +146,7 @@ begin
 			new_pc <= (others=>'0');
 		end if;
 
-		wrdata <= (others=>'0');
+		wrdata <= current_op.readdata2;
 	end process;
 
 	-- Set the alu inputs as needed
