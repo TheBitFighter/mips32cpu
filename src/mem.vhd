@@ -59,7 +59,6 @@ architecture rtl of mem is
 	signal exc_load_reg				: std_logic;
 	signal exc_store_reg			: std_logic;
 
-	signal mem_op_reg : mem_op_type;
 begin  -- rtl
 	mem : process(clk, reset)
 	begin
@@ -86,6 +85,9 @@ begin  -- rtl
 				mem_out <= mem_out_reg;
 				exc_load <= exc_load_reg;
 				exc_store <= exc_store_reg;
+			else
+				mem_out.rd <= '0';
+				mem_out.wr <= '0';
 			end if;
 			if flush = '1' then
 				pc_out <= (others => '0');
@@ -110,13 +112,9 @@ begin  -- rtl
 		J => pcsrc_reg
 	);
 
-	mem_op_reg.memtype <= mem_op.memtype;
-	mem_op_reg.memread <= '0' when stall = '1' else mem_op.memread;
-	mem_op_reg.memwrite <= '0' when stall = '1' else mem_op.memwrite;
-
 	memu_inst : memu
 	port map(
-		op => mem_op_reg,
+		op => mem_op,
 		A => aluresult_in(ADDR_WIDTH-1 downto 0), --?????
 		W => wrdata,
 		D => mem_data,
