@@ -23,6 +23,9 @@ architecture rtl of fetch is
 			q		: out std_logic_vector (31 downto 0)
 		);
 	end component;
+
+	signal insrt_reg : std_logic_vector(INSTR_WIDTH-1 downto 0);
+	signal stall_reg : std_logic;
 begin
 
 	fetcher : process(clk, reset)
@@ -30,8 +33,10 @@ begin
 		-- Reset
 		if (reset = '0') then
 			pc_out <= std_logic_vector(to_signed(0, PC_WIDTH)); -- 0 or -4, tests needed
+			stall_reg <= '0';
 		-- Synchronous part
 		elsif (rising_edge(clk)) then
+			stall_reg <= stall;
 			-- Stall the pipeline
 			if (stall = '0') then
 				-- If pcsrc is asserted, use pc_in as the new counter
@@ -49,9 +54,11 @@ begin
 	imem : imem_altera
 	port map (
 		clock => clk,
-		q => instr,
+		q => insrt_reg,
 		address => pc_out(PC_WIDTH-1 downto 2)
 	);
+
+	instr <= instr when stall_reg = '1' else insrt_reg;
 
 end rtl;
 
