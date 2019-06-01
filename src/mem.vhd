@@ -53,53 +53,41 @@ architecture rtl of mem is
 	end component;
 
 	-- internal registers
-	signal pcsrc_reg					: std_logic;
-	signal mem_out_reg				: mem_out_type;
-	signal memresult_reg			: std_logic_vector(DATA_WIDTH-1 downto 0);
-	signal exc_load_reg				: std_logic;
-	signal exc_store_reg			: std_logic;
-
+	signal mem_op_reg : mem_op_type := MEM_NOP;
+	signal op : mem_op_type;
+	signal wrdata_reg, mem_data_reg : std_logic_vector(DATA_WIDTH-1 downto 0);
 begin  -- rtl
 	mem : process(clk, reset)
 	begin
 		if reset = '0' then
 			pc_out <= (others => '0');
-			--pcsrc <= '0';
 			rd_out <= (others => '0');
 			aluresult_out <= (others => '0');
-			memresult <= (others => '0');
-			--new_pc_out <= (others => '0');
 			wbop_out <= WB_NOP;
-			mem_out <= MEM_OUT_NOP;
-			exc_load <= '0';
-			exc_store <= '0';
+
+			mem_op_reg <= MEM_NOP;
+			wrdata_reg <= (others => '0');
+			mem_data_reg <= (others => '0');
 		elsif rising_edge(clk) then
 			if stall = '0' then
 				pc_out <= pc_in;
-				--pcsrc <= pcsrc_reg;
 				rd_out <= rd_in;
 				aluresult_out <= aluresult_in;
-				memresult <= memresult_reg;
-				--new_pc_out <= new_pc_in;
 				wbop_out <=  wbop_in;
-				mem_out <= mem_out_reg;
-				exc_load <= exc_load_reg;
-				exc_store <= exc_store_reg;
-			else
-				mem_out.rd <= '0';
-				mem_out.wr <= '0';
+
+				mem_op_reg <= mem_op;
+				wrdata_reg <= wrdata;
+				mem_data_reg <= mem_data;
 			end if;
 			if flush = '1' then
 				pc_out <= (others => '0');
-				--pcsrc <= '0';
 				rd_out <= (others => '0');
 				aluresult_out <= (others => '0');
-				memresult <= (others => '0');
-				--new_pc_out <= (others => '0');
 				wbop_out <= WB_NOP;
-				mem_out <= MEM_OUT_NOP;
-				exc_load <= '0';
-				exc_store <= '0';
+
+				mem_op_reg <= MEM_NOP;
+				wrdata_reg <= (others => '0');
+				mem_data_reg <= (others => '0');
 			end if;
 		end if;
 	end process;
@@ -114,17 +102,23 @@ begin  -- rtl
 
 	new_pc_out <= new_pc_in;
 
+	op.memtype <= mem_op_reg.memtype;
+	op.memwrite <= '0' when stall = '1' else mem_op_reg.memwrite;
+	op.memread <= '0' when stall = '1' else mem_op_reg.memread;
+
 	memu_inst : memu
 	port map(
-		op => mem_op,
-		A => aluresult_in(ADDR_WIDTH-1 downto 0), --?????
-		W => wrdata,
-		D => mem_data,
-		M => mem_out_reg,
-		R => memresult_reg,
-		XL => exc_load_reg,
-		XS => exc_store_reg
+		op => op,
+		A => aluresult_out(ADDR_WIDTH-1 downto 0), --?????
+		W => wrdata_reg,
+		D => mem_data_reg,
+		M => mem_out,
+		R => memresult,
+		XL => exc_load,
+		XS => exc_store
 	);
+
+
 end rtl;
 
 -- library ieee;
