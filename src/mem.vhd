@@ -64,11 +64,11 @@ begin  -- rtl
 	begin
 		if reset = '0' then
 			pc_out <= (others => '0');
-			pcsrc <= '0';
+			--pcsrc <= '0';
 			rd_out <= (others => '0');
 			aluresult_out <= (others => '0');
 			memresult <= (others => '0');
-			new_pc_out <= (others => '0');
+			--new_pc_out <= (others => '0');
 			wbop_out <= WB_NOP;
 			mem_out <= MEM_OUT_NOP;
 			exc_load <= '0';
@@ -76,11 +76,11 @@ begin  -- rtl
 		elsif rising_edge(clk) then
 			if stall = '0' then
 				pc_out <= pc_in;
-				pcsrc <= pcsrc_reg;
+				--pcsrc <= pcsrc_reg;
 				rd_out <= rd_in;
 				aluresult_out <= aluresult_in;
 				memresult <= memresult_reg;
-				new_pc_out <= new_pc_in;
+				--new_pc_out <= new_pc_in;
 				wbop_out <=  wbop_in;
 				mem_out <= mem_out_reg;
 				exc_load <= exc_load_reg;
@@ -91,11 +91,11 @@ begin  -- rtl
 			end if;
 			if flush = '1' then
 				pc_out <= (others => '0');
-				pcsrc <= '0';
+				--pcsrc <= '0';
 				rd_out <= (others => '0');
 				aluresult_out <= (others => '0');
 				memresult <= (others => '0');
-				new_pc_out <= (others => '0');
+				--new_pc_out <= (others => '0');
 				wbop_out <= WB_NOP;
 				mem_out <= MEM_OUT_NOP;
 				exc_load <= '0';
@@ -109,8 +109,10 @@ begin  -- rtl
 		op => jmp_op,
 		N => neg,
 		Z => zero,
-		J => pcsrc_reg
+		J => pcsrc
 	);
+
+	new_pc_out <= new_pc_in;
 
 	memu_inst : memu
 	port map(
