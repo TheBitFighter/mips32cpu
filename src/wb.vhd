@@ -31,11 +31,7 @@ begin  -- rtl
 			result <= (others => '0');
 			regwrite <= '0';
 		else--if rising_edge(clk) then
-<<<<<<< HEAD
 			--if stall = '0' then --stall ist überflüssig, wird bereits vom regfile übernommen
-=======
-			--if stall = '0' then
->>>>>>> 24251310dea28299874927015829a5bfb29e1808
 				regwrite <= op.regwrite;
 				rd_out <= rd_in;
 				if op.memtoreg = '1' then
