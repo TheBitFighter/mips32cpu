@@ -55,7 +55,7 @@ architecture rtl of mem is
 	-- internal registers
 	signal mem_op_reg : mem_op_type := MEM_NOP;
 	signal op : mem_op_type;
-	signal wrdata_reg, mem_data_reg : std_logic_vector(DATA_WIDTH-1 downto 0);
+	signal mem_data_reg : std_logic_vector(DATA_WIDTH-1 downto 0);
 begin  -- rtl
 	mem : process(clk, reset)
 	begin
@@ -66,7 +66,6 @@ begin  -- rtl
 			wbop_out <= WB_NOP;
 
 			mem_op_reg <= MEM_NOP;
-			wrdata_reg <= (others => '0');
 			mem_data_reg <= (others => '0');
 		elsif rising_edge(clk) then
 			if stall = '0' then
@@ -76,7 +75,6 @@ begin  -- rtl
 				wbop_out <=  wbop_in;
 
 				mem_op_reg <= mem_op;
-				wrdata_reg <= wrdata;
 				mem_data_reg <= mem_data;
 			end if;
 			if flush = '1' then
@@ -86,7 +84,6 @@ begin  -- rtl
 				wbop_out <= WB_NOP;
 
 				mem_op_reg <= MEM_NOP;
-				wrdata_reg <= (others => '0');
 				mem_data_reg <= (others => '0');
 			end if;
 		end if;
@@ -110,7 +107,7 @@ begin  -- rtl
 	port map(
 		op => op,
 		A => aluresult_out(ADDR_WIDTH-1 downto 0), --?????
-		W => wrdata_reg,
+		W => wrdata,
 		D => mem_data_reg,
 		M => mem_out,
 		R => memresult,
