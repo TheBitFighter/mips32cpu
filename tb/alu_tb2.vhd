@@ -27,6 +27,7 @@ use ieee.std_logic_textio.all;
 
 use work.core_pack.all;
 use work.op_pack.all;
+use work.alu_pkg.all;
 
 entity alu_tb2 is
 
