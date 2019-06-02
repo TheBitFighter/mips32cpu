@@ -73,9 +73,12 @@ begin  -- rtl
 				exec_op.readdata2 <= rddata2;
 				exec_op.rs <= rs;
 				exec_op.rt <= rt;
-				exec_op.rd <= rd_r;
-				exec_op.shamt <= shamt;
 				exec_op.imm <= (16 to DATA_WIDTH-1 => address_immediate(15)) & address_immediate;
+				if opcode = "000000" or opcode = "010000" then
+					exec_op.rd <= rd_r;
+				else
+					exec_op.rd <= rd_i;
+				end if;
 
 				case opcode is
 					when "000000" => -- MiMi special instruction
@@ -83,12 +86,15 @@ begin  -- rtl
 						case func is
 							when "000000" => -- SLL
 								exec_op.aluop <= ALU_SLL;
+								exec_op.readdata1 <= (0 to DATA_WIDTH-6 => '0') & shamt;
 								exec_op.useamt <= '1';
 							when "000010" => -- SRL
 								exec_op.aluop <= ALU_SRL;
+								exec_op.readdata1 <= (0 to DATA_WIDTH-6 => '0') & shamt;
 								exec_op.useamt <= '1';
 							when "000011" => -- SRA
 								exec_op.aluop <= ALU_SRA;
+								exec_op.readdata1 <= (0 to DATA_WIDTH-6 => '0') & shamt;
 								exec_op.useamt <= '1';
 							when "000100" => -- SLLV
 								exec_op.aluop <= ALU_SLL;
@@ -98,10 +104,12 @@ begin  -- rtl
 								exec_op.aluop <= ALU_SRA;
 							when "001000" => -- JR
 								jmp_op <= JMP_JMP;
+								exec_op.regdst <= '1';
+								wb_op.regwrite <= '0';
 							when "001001" => -- JALR
 								jmp_op <= JMP_JMP;
+								exec_op.regdst <= '1';
 								exec_op.link <= '1';
-								wb_op.regwrite <= '0';
 							when "100000" => -- ADD
 								exec_op.aluop <= ALU_ADD;
 							when "100001" => -- ADDU
@@ -119,7 +127,7 @@ begin  -- rtl
 							when "100110" => -- XOR
 								exec_op.aluop <= ALU_XOR;
 							when "100111" => -- NOR
-								exec_op.aluop <= ALU_XOR;
+								exec_op.aluop <= ALU_NOR;
 							when "101010" => -- SLT
 								exec_op.aluop <= ALU_SLT;
 							when "101011" => -- SLTU
@@ -130,25 +138,31 @@ begin  -- rtl
 					when "000001" => -- MiMi regimm instructions
 						case rd_i is
 							when "00000" => -- BLTZ
-								exec_op.aluop <= ALU_SLT;
+								exec_op.aluop <= ALU_SUB;
 								exec_op.branch <= '1';
 								jmp_op <= JMP_BLTZ;
+								exec_op.readdata2 <= (others => '0');
 							when "00001" => -- BGEZ
-								exec_op.aluop <= ALU_SLT;
+								exec_op.aluop <= ALU_SUB;
 								exec_op.branch <= '1';
 								jmp_op <= JMP_BGEZ;
+								exec_op.readdata2 <= (others => '0');
 							when "10000" => -- BLTZAL
-								exec_op.aluop <= ALU_SLT;
+								exec_op.aluop <= ALU_SUB;
 								exec_op.link <= '1';
+								exec_op.rd <= (others => '1'); -- r31
 								exec_op.branch <= '1';
 								jmp_op <= JMP_BLTZ;
 								wb_op.regwrite <= '1';
+								exec_op.readdata2 <= (others => '0');
 							when "10001" => -- BGEZAL
-								exec_op.aluop <= ALU_SLT;
+								exec_op.aluop <= ALU_SUB;
 								exec_op.link <= '1';
+								exec_op.rd <= (others => '1'); -- r31
 								exec_op.branch <= '1';
 								jmp_op <= JMP_BGEZ;
 								wb_op.regwrite <= '1';
+								exec_op.readdata2 <= (others => '0');
 							when others =>
 								exc_dec <= '1';
 						end case;
@@ -158,6 +172,7 @@ begin  -- rtl
 					when "000011" => -- JAL
 						exec_op.useimm <= '1';
 						exec_op.link <= '1';
+						exec_op.rd <= (others => '1'); -- r31
 						jmp_op <= JMP_JMP;
 						wb_op.regwrite <= '1';
 					when "000100" => -- BEQ
@@ -169,13 +184,15 @@ begin  -- rtl
 						exec_op.branch <= '1';
 						jmp_op <= JMP_BNE;
 					when "000110" => -- BLEZ
-						exec_op.aluop <= ALU_SLT;
+						exec_op.aluop <= ALU_SUB;
 						exec_op.branch <= '1';
 						jmp_op <= JMP_BLEZ;
+						exec_op.readdata2 <= (others => '0');
 					when "000111" => -- BGTZ
-						exec_op.aluop <= ALU_SLT;
+						exec_op.aluop <= ALU_SUB;
 						exec_op.branch <= '1';
 						jmp_op <= JMP_BGTZ;
+						exec_op.readdata2 <= (others => '0');
 					when "001000" => -- ADDI
 						exec_op.aluop <= ALU_ADD;
 						exec_op.useimm <= '1';
@@ -193,27 +210,31 @@ begin  -- rtl
 						exec_op.aluop <= ALU_SLTU;
 						exec_op.useimm <= '1';
 						wb_op.regwrite <= '1';
+						exec_op.imm <= (16 to DATA_WIDTH-1 => '0') & address_immediate;
 					when "001100" => -- ANDI
 						exec_op.aluop <= ALU_AND;
 						exec_op.useimm <= '1';
 						wb_op.regwrite <= '1';
+						exec_op.imm <= (16 to DATA_WIDTH-1 => '0') & address_immediate;
 					when "001101" => -- ORI
 						exec_op.aluop <= ALU_OR;
 						exec_op.useimm <= '1';
 						wb_op.regwrite <= '1';
+						exec_op.imm <= (16 to DATA_WIDTH-1 => '0') & address_immediate;
 					when "001110" => -- XORI
 						exec_op.aluop <= ALU_XOR;
 						exec_op.useimm <= '1';
 						wb_op.regwrite <= '1';
+						exec_op.imm <= (16 to DATA_WIDTH-1 => '0') & address_immediate;
 					when "001111" => -- LUI;
 						exec_op.aluop <= ALU_LUI;
 						exec_op.useimm <= '1';
 						wb_op.regwrite <= '1';
+						exec_op.imm <= (16 to DATA_WIDTH-1 => '0') & address_immediate;
 					when "010000" => -- MiMi cop0 instructions
 						case rd_r is
 							when "00000" => -- MFC0
 								exec_op.cop0 <= '1';
-								exec_op.regdst <= '1';
 								cop0_op.addr <= rd_r;
 								wb_op.regwrite <= '1';
 							when "00100" => -- MTC0
