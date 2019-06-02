@@ -126,7 +126,7 @@ begin
 			aluresult <= cop0_rddata;
 		-- Check if the pc should be used for output
 		elsif (current_op.link = '1') then
-			aluresult <= (pc_out'length to DATA_WIDTH-1 => '0') & std_logic_vector(signed(pc_out)+ 4);--pc_out;
+			aluresult <= (pc_out'length to DATA_WIDTH-1 => '0') & std_logic_vector(signed(pc_out)+ 4);
 		-- Otherwise the alu output will be used
 		else
 			aluresult <= alu_inter;

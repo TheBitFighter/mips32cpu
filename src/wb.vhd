@@ -30,11 +30,10 @@ begin  -- rtl
 			rd_out <= (others => '0');
 			result <= (others => '0');
 			regwrite <= '0';
-		else--if rising_edge(clk) then
-			--if stall = '0' then --stall ist überflüssig, wird bereits vom regfile übernommen
-				regwrite <= op.regwrite;
-				rd_out <= rd_in;
-			--end if;
+		else
+			--stall ist überflüssig, wird bereits vom regfile/mem übernommen
+			regwrite <= op.regwrite;
+			rd_out <= rd_in;
 			if op.memtoreg = '1' then
 				result <= memresult;
 			else
