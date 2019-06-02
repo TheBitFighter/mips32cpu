@@ -6,7 +6,7 @@ use work.core_pack.all;
 use work.op_pack.all;
 
 entity wb is
-	
+
 	port (
 		clk, reset : in  std_logic;
 		stall      : in  std_logic;
@@ -24,5 +24,27 @@ end wb;
 architecture rtl of wb is
 
 begin  -- rtl
-
+	wb : process(all)
+	begin
+		if reset = '0' then
+			rd_out <= (others => '0');
+			result <= (others => '0');
+			regwrite <= '0';
+		else--if rising_edge(clk) then
+			--if stall = '0' then --stall ist überflüssig, wird bereits vom regfile übernommen
+				regwrite <= op.regwrite;
+				rd_out <= rd_in;
+			--end if;
+			if op.memtoreg = '1' then
+				result <= memresult;
+			else
+				result <= aluresult;
+			end if;
+			if flush = '1' then
+				rd_out <= (others => '0');
+				result <= (others => '0');
+				regwrite <= '0';
+			end if;
+		end if;
+	end process;
 end rtl;
