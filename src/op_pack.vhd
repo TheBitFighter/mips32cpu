@@ -35,13 +35,14 @@ package op_pack is
 		regdst     : std_logic;
 		cop0       : std_logic;
 		ovf        : std_logic;
+		shamt			 : std_logic_vector(4 downto 0);
 	end record;
 
 	constant EXEC_NOP : exec_op_type :=
 		(ALU_NOP,
 		 (others => '0'), (others => '0'), (others => '0'),
 		 (others => '0'), (others => '0'), (others => '0'),
-		 '0', '0', '0', '0', '0', '0', '0');
+		 '0', '0', '0', '0', '0', '0', '0', (others => '0'));
 
 	type cop0_op_type is
 	record
