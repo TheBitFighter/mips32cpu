@@ -1,0 +1,54 @@
+#arguments to the compiler ( -2008 selects the VHDL 2008 standard )
+VCOM_ARGS =-2008 -work work -suppress 1236
+ 
+#additional arguments to vsim
+VSIM_ARGS =-msgmode both
+
+#list the VHDL input files here ( notice the escape character !)
+VHDL_FILES = \
+
+  src/alu.vhd\
+  src/alu_pkg.vhd
+  
+#list the VHDL used during simulation ( testbenches etc .)
+
+TB_FILES = \
+   tb/alu_tb2.vhd
+
+#the name of your testbench entity
+TB = alu_tb2
+
+#the desired simulation time
+SIM_TIME = 100ns
+
+ #compile everything
+compile:
+	rm -f log
+	vlib work | tee log
+	for i in \$(VHDL_FILES); do \
+		vcom \$(VCOM_ARGS)\$\$i | tee -a log;\
+	done ;
+	for i in \$(TB_FILES); do \
+		vcom \$(VCOM_ARGS) \$\$i | tee -a log ;\
+	done ;
+	
+	
+	@echo " --------------------------------------------------------------"
+	@echo " -- Error and Warning Summary --"
+	@echo " --------------------------------------------------------------"
+	@cat log | grep ’Warning \| Error’
+
+list_sources:
+	@for i in \$(VHDL_FILES); do \
+		echo \$\$i;\
+	done ;
+
+sim:
+ vsim -do "vsim \$(TB) \$(VSIM_ARGS); do wave .do; run \$(SIM_TIME)"	
+	
+	
+clean:
+	rm -f transcript
+
+	rm -f log
+	rm -fr work
