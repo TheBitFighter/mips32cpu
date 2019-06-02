@@ -86,8 +86,6 @@ package op_pack is
 		wrdata	 : std_logic_vector(DATA_WIDTH-1 downto 0);
 	end record;
 
-	constant MEM_OUT_NOP : mem_out_type := ((others => '0'), '0', '0', (others => '0'), (others => '0'));
-
 	type mem_in_type is
 	record
 		busy   : std_logic;
