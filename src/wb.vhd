@@ -24,7 +24,7 @@ end wb;
 architecture rtl of wb is
 
 begin  -- rtl
-	wb : process(clk, reset)
+	wb : process(all)
 	begin
 		if reset = '0' then
 			rd_out <= (others => '0');
@@ -34,12 +34,12 @@ begin  -- rtl
 			--if stall = '0' then --stall ist überflüssig, wird bereits vom regfile übernommen
 				regwrite <= op.regwrite;
 				rd_out <= rd_in;
-				if op.memtoreg = '1' then
-					result <= memresult;
-				else
-					result <= aluresult;
-				end if;
 			--end if;
+			if op.memtoreg = '1' then
+				result <= memresult;
+			else
+				result <= aluresult;
+			end if;
 			if flush = '1' then
 				rd_out <= (others => '0');
 				result <= (others => '0');
