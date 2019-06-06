@@ -20,12 +20,29 @@ end ctrl;
 architecture rtl of ctrl is
 
 	signal current_op : exec_op_type;
+	constant nop_instr : exec_op_type := (
+		aluop => ALU_NOP,
+		readdata1 => (others=>'0'),
+		readdata2 => (others=>'0'),
+		imm => (others=>'0'),
+		rs => (others=>'0'),
+		rt => (others=>'0'),
+		rd => (others=>'0'),
+		useimm => '0',
+		useamt => '0',
+		link => '0',
+		branch => '0',
+		regdst => '0',
+		cop0 => '0',
+		ovf => '0'
+	);
 
 begin
 
 	latch : process(clk, reset)
 	begin
 		if (reset = '1') then
+			current_op <= nop_instr;
 		elsif (rising_edge(clk)) then
 			current_op <= op;
 		end if;
