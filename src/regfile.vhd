@@ -32,13 +32,11 @@ begin  -- rtl
 		end if;
 	end process;
 
-	rddata1 <= rddata1 when stall = '1' else
-						(others => '0') when rdaddr1 = (0 to REG_BITS-1 => '0') else
+	rddata1 <= (others => '0') when rdaddr1 = (0 to REG_BITS-1 => '0') else
 						wrdata when (rdaddr1 = wraddr and regwrite = '1') else
 						reg(to_integer(unsigned(rdaddr1)));
 
-	rddata2 <= rddata2 when stall = '1' else
-						(others => '0') when rdaddr2 = (0 to REG_BITS-1 => '0') else
+	rddata2 <= (others => '0') when rdaddr2 = (0 to REG_BITS-1 => '0') else
 						wrdata when (rdaddr2 = wraddr and regwrite = '1') else
 						reg(to_integer(unsigned(rdaddr2)));
 end rtl;

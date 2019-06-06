@@ -24,27 +24,29 @@ architecture rtl of fetch is
 		);
 	end component;
 
-	signal insrt_reg : std_logic_vector(INSTR_WIDTH-1 downto 0);
+	signal insrt_reg, stall_instr_reg : std_logic_vector(INSTR_WIDTH-1 downto 0);
 	signal stall_reg : std_logic;
+	signal pc_next : std_logic_vector(PC_WIDTH-1 downto 0);
 begin
 
 	fetcher : process(clk, reset)
 	begin
 		-- Reset
 		if (reset = '0') then
-			pc_out <= std_logic_vector(to_signed(0, PC_WIDTH));
+			pc_next <= std_logic_vector(to_signed(0, PC_WIDTH));
 			stall_reg <= '0';
 		-- Synchronous part
 		elsif (rising_edge(clk)) then
 			stall_reg <= stall;
+			stall_instr_reg <= insrt_reg;
 			-- Stall the pipeline
 			if (stall = '0') then
 				-- If pcsrc is asserted, use pc_in as the new counter
 				if (pcsrc = '1') then
-					pc_out <= pc_in;
+					pc_next <= pc_in;
 				-- If it is not asserted, add 4 to the program counter
 				else
-					pc_out <= std_logic_vector(signed(pc_out) + 4);
+					pc_next <= std_logic_vector(signed(pc_next) + 4);
 				end if;
 			end if;
 		end if;
@@ -55,9 +57,10 @@ begin
 	port map (
 		clock => clk,
 		q => insrt_reg,
-		address => pc_out(PC_WIDTH-1 downto 2)
+		address => pc_next(PC_WIDTH-1 downto 2)
 	);
 
-	instr <= instr when stall_reg = '1' else insrt_reg;
+	pc_out <= pc_next;
+	instr <= stall_instr_reg when stall_reg = '1' else insrt_reg;
 
 end rtl;

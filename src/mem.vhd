@@ -56,13 +56,14 @@ architecture rtl of mem is
 	signal mem_op_reg : mem_op_type := MEM_NOP;
 	signal op : mem_op_type;
 	signal wrdata_reg : std_logic_vector(DATA_WIDTH-1 downto 0);
+	signal aluresult_next : std_logic_vector(DATA_WIDTH-1 downto 0);
 begin  -- rtl
 	mem : process(clk, reset)
 	begin
 		if reset = '0' then
 			pc_out <= (others => '0');
 			rd_out <= (others => '0');
-			aluresult_out <= (others => '0');
+			aluresult_next <= (others => '0');
 			wbop_out <= WB_NOP;
 
 			mem_op_reg <= MEM_NOP;
@@ -71,7 +72,7 @@ begin  -- rtl
 			if stall = '0' then
 				pc_out <= pc_in;
 				rd_out <= rd_in;
-				aluresult_out <= aluresult_in;
+				aluresult_next <= aluresult_in;
 				wbop_out <=  wbop_in;
 
 				mem_op_reg <= mem_op;
@@ -80,7 +81,7 @@ begin  -- rtl
 			if flush = '1' then
 				pc_out <= (others => '0');
 				rd_out <= (others => '0');
-				aluresult_out <= (others => '0');
+				aluresult_next <= (others => '0');
 				wbop_out <= WB_NOP;
 
 				mem_op_reg <= MEM_NOP;
@@ -106,7 +107,7 @@ begin  -- rtl
 	memu_inst : memu
 	port map(
 		op => op,
-		A => aluresult_out(ADDR_WIDTH-1 downto 0),
+		A => aluresult_next(ADDR_WIDTH-1 downto 0),
 		W => wrdata_reg,
 		D => mem_data,
 		M => mem_out,
@@ -115,5 +116,6 @@ begin  -- rtl
 		XS => exc_store
 	);
 
+	aluresult_out <= aluresult_next;
 
 end rtl;

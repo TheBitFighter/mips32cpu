@@ -24,6 +24,8 @@ begin
 	-- Process to determine the result output depending on the desired operation
 	result : process(all)
 	begin
+		calc <= (others => '0');
+
 		case op is
 			when ALU_NOP =>
 				R <= A;
