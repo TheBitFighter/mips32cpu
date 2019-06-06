@@ -39,7 +39,7 @@ begin
 		-- Synchronous part
 		elsif (rising_edge(clk)) then
 			stall_reg <= stall;
-			stall_instr_reg <= insrt;
+			stall_instr_reg <= instr;
 			-- Stall the pipeline
 			if (stall = '0') then
 				-- If pcsrc is asserted, use pc_in as the new counter
