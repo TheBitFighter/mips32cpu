@@ -65,7 +65,7 @@ architecture rtl of exec is
 	);
 	signal alu_inter, adder_inter : std_logic_vector(DATA_WIDTH-1 downto 0);
 	signal current_op : exec_op_type;
-	signal second_operator : std_logic_vector(DATA_WIDTH-1 downto 0);
+	signal first_operator, second_operator : std_logic_vector(DATA_WIDTH-1 downto 0);
 	signal exc_ovf_int, zero_int : std_logic;
 
 begin
@@ -152,7 +152,19 @@ begin
 	-- Set the alu inputs as needed
 	alu_in : process(all)
 	begin
-		if (current_op.useimm = '0') then
+		if (forwardA = FWD_ALU) then
+			first_operator <= mem_aluresult;
+		elsif (forwardA = FWD_WB) then
+			first_operator <= wb_result;
+		else
+			first_operator <= current_op.readdata1;
+		end if;
+
+		if (forwardB = FWD_ALU) then
+			second_operator <= mem_aluresult;
+		elsif (forwardB = FWD_WB) then
+			second_operator <= wb_result;
+		elsif (current_op.useimm = '0') then
 			second_operator <= current_op.readdata2;
 		else
 			second_operator <= current_op.imm;
@@ -168,7 +180,7 @@ begin
 	alu_inst : alu
 	port map (
 		op => current_op.aluop,
-		A => current_op.readdata1,
+		A => first_operator,
 		B => second_operator,
 		R => alu_inter,
 		Z => zero_int,
