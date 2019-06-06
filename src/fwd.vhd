@@ -48,9 +48,9 @@ begin
 
 	checkB : process(current_op)
 	begin
-		if (current_op.rs = rd1) then
+		if (current_op.rt = rd1) then
 			forwardB <= FWD_ALU;
-		elsif (current_op.rs = rd2) then
+		elsif (current_op.rt = rd2) then
 			forwardB <= FWD_WB;
 		else
 			forwardB <= FWD_NONE;
