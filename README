@@ -1,0 +1,4 @@
+CPU project for university purposes. Implementation of the MIPS32 standard.
+
+Use with caution! This implementation is tested for Altera Stratix Cyclone IV devices
+and DOES NOT resolve all hazards! 
