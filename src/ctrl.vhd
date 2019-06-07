@@ -11,15 +11,16 @@ entity ctrl is
 		clk : in std_logic;
 		reset : in std_logic;
 		op : in exec_op_type;
-		fl_fetch : out std_logic;
-		fl_decode : out std_logic
-);
+		fl_out : out std_logic
+		);
 
 end ctrl;
 
 architecture rtl of ctrl is
 
 	signal current_op : exec_op_type;
+	type state_type is (IDLE, FLUSH2);
+	signal state : state_type := IDLE;
 	constant nop_instr : exec_op_type := (
 		aluop => ALU_NOP,
 		readdata1 => (others=>'0'),
@@ -48,16 +49,22 @@ begin
 		end if;
 	end process;
 
-	flush : process(current_op)
+	flush : process(current_op, clk)
 	begin
-		if (current_op.branch = '1') then
-			fl_fetch <= '1';
-			fl_decode <= '1';
-		else
-			fl_fetch <= '0';
-			fl_decode <= '0';
-		end if;
-
+		case state is
+			when IDLE =>
+				if (current_op.branch = '1') then
+					fl_out <= '1';
+					state <= FLUSH2;
+				else
+					fl_out <= '0';
+				end if;
+			when FLUSH2 =>
+				if (rising_edge(clk)) then
+					fl_out <= '1';
+					state <= IDLE;
+				end if;
+		end case;
 	end process;
 
 end rtl;

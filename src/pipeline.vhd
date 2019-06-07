@@ -131,7 +131,7 @@ architecture rtl of pipeline is
 
 	-- signals
 	signal stall : std_logic;
-	signal flush, fl_decode, fl_fetch : std_logic
+	signal flush, fl_decode : std_logic
 
 	signal fetch_pc_out	   : std_logic_vector(PC_WIDTH-1 downto 0);
 	signal fetch_instr	   : std_logic_vector(INSTR_WIDTH-1 downto 0);
@@ -287,8 +287,7 @@ begin  -- rtl
 			clk => clk,
 			reset => reset,
 			op => decode_exc_op,
-			fl_fetch => fl_fetch, -- ?
-			fl_decode => fl_decode
+			fl_out => fl_decode
 		);
 
 		fwd_inst : fwd
