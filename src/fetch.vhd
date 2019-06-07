@@ -35,10 +35,11 @@ begin
 		if (reset = '0') then
 			pc_next <= std_logic_vector(to_signed(0, PC_WIDTH));
 			stall_reg <= '0';
+			stall_instr_reg <= (others => '0');
 		-- Synchronous part
 		elsif (rising_edge(clk)) then
 			stall_reg <= stall;
-			stall_instr_reg <= insrt_reg;
+			stall_instr_reg <= instr;
 			-- Stall the pipeline
 			if (stall = '0') then
 				-- If pcsrc is asserted, use pc_in as the new counter
