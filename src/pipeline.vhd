@@ -110,9 +110,28 @@ architecture rtl of pipeline is
 			regwrite   : out std_logic);
 	end component;
 
+	component cntrl is
+		port (
+			clk : in std_logic;
+			reset : in std_logic;
+			op : in exec_op_type;
+			fl_fetch : out std_logic;
+			fl_decode : out std_logic);
+	end component;
+
+	component fwd is
+		port (
+			reset : in std_logic;
+			clk : in std_logic;
+			next_op : in exec_op_type;
+			forwardA : out fwd_type;
+			forwardB : out fwd_type
+		);
+	end component;
+
 	-- signals
 	signal stall : std_logic;
-	signal flush : std_logic;
+	signal flush, fl_decode, fl_fetch : std_logic
 
 	signal fetch_pc_out	   : std_logic_vector(PC_WIDTH-1 downto 0);
 	signal fetch_instr	   : std_logic_vector(INSTR_WIDTH-1 downto 0);
@@ -149,6 +168,10 @@ architecture rtl of pipeline is
 	signal wb_rd_out     : std_logic_vector(REG_BITS-1 downto 0);
 	signal wb_result     : std_logic_vector(DATA_WIDTH-1 downto 0);
 	signal wb_regwrite   : std_logic;
+
+	signal forwardA		: fwd_type;
+	signal forwardB		: fwd_type;
+
 begin  -- rtl
 	stall <= '1' when mem_in.busy = '1' else '0';
 	flush <= '0';
@@ -169,7 +192,7 @@ begin  -- rtl
 		clk => clk,
 		reset => reset,
 		stall => stall,
-		flush => flush,
+		flush => fl_decode,
 		pc_in => fetch_pc_out,
 		instr => fetch_instr,
 		wraddr => wb_rd_out,
@@ -207,11 +230,11 @@ begin  -- rtl
 		jmpop_out => exec_jmpop_out,
 		wbop_in => decode_wb_op,
 		wbop_out => exec_wbop_out,
-		forwardA => FWD_NONE, -- ???
-		forwardB => FWD_NONE, -- ???
+		forwardA => forwardA,
+		forwardB => forwardB,
 		cop0_rddata => (others => '0'), -- ???
-		mem_aluresult => mem_aluresult_out, -- ???
-		wb_result => wb_result, -- ???
+		mem_aluresult => mem_aluresult_out,
+		wb_result => wb_result,
 		exc_ovf => exec_exc_ovf
 	);
 
@@ -258,4 +281,23 @@ begin  -- rtl
 			rd_in => mem_rd_out,
 			rd_out => wb_rd_out
 		);
+
+		cntrl_inst : cntrl
+		port map (
+			clk => clk,
+			reset => reset,
+			op => decode_exc_op,
+			fl_fetch => fl_fetch, -- ?
+			fl_decode => fl_decode
+		);
+
+		fwd_inst : fwd
+		port map (
+			clk => clk,
+			reset => reset,
+			next_op => decode_exc_op,
+			forwardA => forwardA,
+			forwardB => forwardB
+		);
+
 end rtl;
