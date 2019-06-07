@@ -115,8 +115,7 @@ architecture rtl of pipeline is
 			clk : in std_logic;
 			reset : in std_logic;
 			pcsrc : in std_logic;
-			fl_fetch : out std_logic;
-			fl_decode : out std_logic);
+			fl_out : out std_logic);
 	end component;
 
 	component fwd is
@@ -131,7 +130,7 @@ architecture rtl of pipeline is
 
 	-- signals
 	signal stall : std_logic;
-	signal flush, fl_decode : std_logic
+	signal flush, fl_decode : std_logic;
 
 	signal fetch_pc_out	   : std_logic_vector(PC_WIDTH-1 downto 0);
 	signal fetch_instr	   : std_logic_vector(INSTR_WIDTH-1 downto 0);
@@ -286,7 +285,7 @@ begin  -- rtl
 		port map (
 			clk => clk,
 			reset => reset,
-			op => mem_pcsrc,
+			pcsrc => mem_pcsrc,
 			fl_out => fl_decode
 		);
 
@@ -294,7 +293,7 @@ begin  -- rtl
 		port map (
 			clk => clk,
 			reset => reset,
-			next_op => decode_exc_op,
+			next_op => decode_exec_op,
 			forwardA => forwardA,
 			forwardB => forwardB
 		);

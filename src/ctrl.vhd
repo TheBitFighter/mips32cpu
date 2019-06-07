@@ -21,7 +21,6 @@ architecture rtl of ctrl is
 	signal pcsrc_reg : std_logic;
 	type state_type is (IDLE, FLUSH2);
 	signal state : state_type := IDLE;
-	);
 
 begin
 
@@ -30,7 +29,7 @@ begin
 		if (reset = '1') then
 			pcsrc_reg <= '0';
 		elsif (rising_edge(clk)) then
-			pcsrc_reg <= pcsrc
+			pcsrc_reg <= pcsrc;
 		end if;
 	end process;
 
