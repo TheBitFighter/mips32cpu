@@ -114,7 +114,7 @@ architecture rtl of pipeline is
 		port (
 			clk : in std_logic;
 			reset : in std_logic;
-			op : in exec_op_type;
+			pcsrc : in std_logic;
 			fl_fetch : out std_logic;
 			fl_decode : out std_logic);
 	end component;
@@ -286,7 +286,7 @@ begin  -- rtl
 		port map (
 			clk => clk,
 			reset => reset,
-			op => decode_exc_op,
+			op => mem_pcsrc,
 			fl_out => fl_decode
 		);
 
