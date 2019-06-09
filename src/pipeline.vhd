@@ -125,11 +125,13 @@ architecture rtl of pipeline is
 			exec_rs : in std_logic_vector(REG_BITS-1 downto 0);
 			exec_rt : in std_logic_vector(REG_BITS-1 downto 0);
 			mem_rd : in std_logic_vector(REG_BITS-1 downto 0);
+			mem_regwrite : in std_logic;
 			wb_rd : in std_logic_vector(REG_BITS-1 downto 0);
+			wb_regwrite : in std_logic;
 			forwardA : out fwd_type;
 			forwardB : out fwd_type
-	);
-end component;
+		);
+	end component;
 
 	-- signals
 	signal stall : std_logic;
@@ -299,7 +301,9 @@ begin  -- rtl
 			exec_rs => decode_exec_op.rs,
 			exec_rt => decode_exec_op.rt,
 			mem_rd => exec_rd,
+			mem_regwrite => exec_wbop_out.regwrite,
 			wb_rd => mem_rd_out,
+			wb_regwrite => mem_wbop_out.regwrite,
 			forwardA => forwardA,
 			forwardB => forwardB
 		);
