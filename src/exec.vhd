@@ -135,8 +135,6 @@ begin
 		else
 			new_pc <= (others=>'0');
 		end if;
-
-		wrdata <= current_op.readdata2;
 	end process;
 
 	-- Set the alu inputs as needed
@@ -158,6 +156,17 @@ begin
 			second_operator <= wb_result;
 		else
 			second_operator <= current_op.readdata2;
+		end if;
+	end process;
+
+	writedata : process(all)
+	begin
+		wrdata <= current_op.readdata2;
+
+		if forwardB_reg = FWD_ALU then
+			wrdata <= mem_aluresult;
+		elsif forwardB_reg = FWD_WB then
+			wrdata <= wb_result;
 		end if;
 	end process;
 

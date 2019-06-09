@@ -29,11 +29,13 @@ begin  -- rtl
 			rdaddr1_reg <= (others => '0');
 			rdaddr2_reg <= (others => '0');
 		elsif rising_edge(clk) then
-			rdaddr1_reg <= rdaddr1;
-			rdaddr2_reg <= rdaddr2;
-			-- write to register
-			if regwrite = '1' and stall = '0' then
-				reg(to_integer(unsigned(wraddr))) <= wrdata;
+			if stall = '0' then
+				rdaddr1_reg <= rdaddr1;
+				rdaddr2_reg <= rdaddr2;
+				-- write to register
+				if regwrite = '1' then
+					reg(to_integer(unsigned(wraddr))) <= wrdata;
+				end if;
 			end if;
 		end if;
 	end process;
