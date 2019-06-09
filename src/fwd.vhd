@@ -9,48 +9,38 @@ entity fwd is
 	port (
 		reset : in std_logic;
 		clk : in std_logic;
-		next_op : in exec_op_type;
+		exec_rs : in std_logic_vector(REG_BITS-1 downto 0);
+		exec_rt : in std_logic_vector(REG_BITS-1 downto 0);
+		mem_rd : in std_logic_vector(REG_BITS-1 downto 0);
+		wb_rd : in std_logic_vector(REG_BITS-1 downto 0);
 		forwardA : out fwd_type;
 		forwardB : out fwd_type
 );
-
 end fwd;
 
 architecture rtl of fwd is
-
-	signal current_op : exec_op_type;
-	signal rd1, rd2 : std_logic_vector(REG_BITS-1 downto 0);
-
 begin
 
-	latch : process(reset, clk)
+	checkA : process(all)
 	begin
-		if (reset = '0') then
-			rd1 <= (others=>'0');
-			rd2 <= (others=>'0');
-		elsif (rising_edge(clk)) then
-			current_op <= next_op;
-			rd1 <= current_op.rd;
-			rd2 <= rd1;
-		end if;
-	end process;
-
-	checkA : process(current_op)
-	begin
-		if (current_op.rs = rd1) then
+		if (exec_rs = (0 to REG_BITS-1 => '0')) then
+			forwardA <= FWD_NONE;
+		elsif (exec_rs = mem_rd) then
 			forwardA <= FWD_ALU;
-		elsif (current_op.rs = rd2) then
+		elsif (exec_rs = wb_rd) then
 			forwardA <= FWD_WB;
 		else
 			forwardA <= FWD_NONE;
 		end if;
 	end process;
 
-	checkB : process(current_op)
+	checkB : process(all)
 	begin
-		if (current_op.rt = rd1) then
+		if (exec_rt = (0 to REG_BITS-1 => '0')) then
+			forwardB <= FWD_NONE;
+		elsif (exec_rt = mem_rd) then
 			forwardB <= FWD_ALU;
-		elsif (current_op.rt = rd2) then
+		elsif (exec_rt = wb_rd) then
 			forwardB <= FWD_WB;
 		else
 			forwardB <= FWD_NONE;

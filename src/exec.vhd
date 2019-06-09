@@ -47,27 +47,11 @@ architecture rtl of exec is
 		);
 	end component;
 
-	constant nop_instr : exec_op_type := (
-		aluop => ALU_NOP,
-		readdata1 => (others=>'0'),
-		readdata2 => (others=>'0'),
-		imm => (others=>'0'),
-		rs => (others=>'0'),
-		rt => (others=>'0'),
-		rd => (others=>'0'),
-		useimm => '0',
-		useamt => '0',
-		link => '0',
-		branch => '0',
-		regdst => '0',
-		cop0 => '0',
-		ovf => '0'
-	);
 	signal alu_inter, adder_inter : std_logic_vector(DATA_WIDTH-1 downto 0);
 	signal current_op : exec_op_type;
 	signal first_operator, second_operator : std_logic_vector(DATA_WIDTH-1 downto 0);
 	signal exc_ovf_int, zero_int : std_logic;
-
+	signal forwardA_reg, forwardB_reg : fwd_type;
 begin
 
 	-- Breakout signals from instruction
@@ -81,7 +65,9 @@ begin
 		-- Asynchronous reset
 		if (reset = '0') then
 
-			current_op <= nop_instr;
+			current_op <= EXEC_NOP;
+			forwardA_reg <= FWD_NONE;
+			forwardB_reg <= FWD_NONE;
 
 			-- Reset forward signals
 			pc_out <= (others=>'0');
@@ -93,6 +79,8 @@ begin
 			-- Stall the pipeline
 			if (stall = '0') then
 				current_op <= op;
+				forwardA_reg <= forwardA;
+				forwardB_reg <= forwardB;
 				-- Forward signals
 				pc_out <= pc_in;
 				memop_out <= memop_in;
@@ -101,7 +89,9 @@ begin
 			end if;
 			if (flush = '1') then
 				-- Flush the operation registers
-				current_op <= nop_instr;
+				current_op <= EXEC_NOP;
+				forwardA_reg <= FWD_NONE;
+				forwardB_reg <= FWD_NONE;
 
 				-- Reset forward signals
 				pc_out <= (others=>'0');
@@ -152,22 +142,22 @@ begin
 	-- Set the alu inputs as needed
 	alu_in : process(all)
 	begin
-		if (forwardA = FWD_ALU) then
+		if (forwardA_reg = FWD_ALU) then
 			first_operator <= mem_aluresult;
-		elsif (forwardA = FWD_WB) then
+		elsif (forwardA_reg = FWD_WB) then
 			first_operator <= wb_result;
 		else
 			first_operator <= current_op.readdata1;
 		end if;
 
-		if (forwardB = FWD_ALU) then
-			second_operator <= mem_aluresult;
-		elsif (forwardB = FWD_WB) then
-			second_operator <= wb_result;
-		elsif (current_op.useimm = '0') then
-			second_operator <= current_op.readdata2;
-		else
+		if (current_op.useimm = '1') then
 			second_operator <= current_op.imm;
+		elsif (forwardB_reg = FWD_ALU) then
+			second_operator <= mem_aluresult;
+		elsif (forwardB_reg = FWD_WB) then
+			second_operator <= wb_result;
+		else
+			second_operator <= current_op.readdata2;
 		end if;
 	end process;
 

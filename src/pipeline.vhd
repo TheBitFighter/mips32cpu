@@ -110,7 +110,7 @@ architecture rtl of pipeline is
 			regwrite   : out std_logic);
 	end component;
 
-	component cntrl is
+	component ctrl is
 		port (
 			clk : in std_logic;
 			reset : in std_logic;
@@ -122,11 +122,14 @@ architecture rtl of pipeline is
 		port (
 			reset : in std_logic;
 			clk : in std_logic;
-			next_op : in exec_op_type;
+			exec_rs : in std_logic_vector(REG_BITS-1 downto 0);
+			exec_rt : in std_logic_vector(REG_BITS-1 downto 0);
+			mem_rd : in std_logic_vector(REG_BITS-1 downto 0);
+			wb_rd : in std_logic_vector(REG_BITS-1 downto 0);
 			forwardA : out fwd_type;
 			forwardB : out fwd_type
-		);
-	end component;
+	);
+end component;
 
 	-- signals
 	signal stall : std_logic;
@@ -281,7 +284,7 @@ begin  -- rtl
 			rd_out => wb_rd_out
 		);
 
-		cntrl_inst : cntrl
+		ctrl_inst : ctrl
 		port map (
 			clk => clk,
 			reset => reset,
@@ -293,7 +296,10 @@ begin  -- rtl
 		port map (
 			clk => clk,
 			reset => reset,
-			next_op => decode_exec_op,
+			exec_rs => decode_exec_op.rs,
+			exec_rt => decode_exec_op.rt,
+			mem_rd => exec_rd,
+			wb_rd => mem_rd_out,
 			forwardA => forwardA,
 			forwardB => forwardB
 		);
