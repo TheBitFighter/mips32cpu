@@ -242,9 +242,10 @@ begin  -- rtl
 				wb_op.regwrite <= '1';
 				exec_op.imm <= (16 to DATA_WIDTH-1 => '0') & address_immediate;
 			when "010000" => -- MiMi cop0 instructions
-				case rd_r is
+				case rs is
 					when "00000" => -- MFC0
 						exec_op.cop0 <= '1';
+						exec_op.rd <= rt;
 						cop0_op.addr <= rd_r;
 						wb_op.regwrite <= '1';
 					when "00100" => -- MTC0
@@ -314,8 +315,8 @@ begin  -- rtl
 		clk => clk,
 		reset => reset,
 		stall => stall,
-		rdaddr1 => instr(25 downto 21),
-		rdaddr2 => instr(20 downto 16),
+		rdaddr1 => instr(25 downto 21), -- rs
+		rdaddr2 => instr(20 downto 16), -- rt/rd
 		rddata1 => rddata1,
 		rddata2 => rddata2,
 		wraddr => wraddr,

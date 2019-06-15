@@ -110,7 +110,7 @@ begin
 			neg <= '1';
 		end if;
 		zero <= zero_int;
-		exc_ovf <= exc_ovf_int;
+		exc_ovf <= exc_ovf_int and current_op.ovf;
 		-- Check for a cop0 instruction
 		if (current_op.cop0 = '1') then
 			aluresult <= cop0_rddata;
