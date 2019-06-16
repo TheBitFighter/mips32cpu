@@ -114,8 +114,27 @@ architecture rtl of pipeline is
 		port (
 			clk : in std_logic;
 			reset : in std_logic;
-			pcsrc : in std_logic;
-			fl_out : out std_logic);
+			stall : in std_logic;
+			pcsrc_in : in std_logic;
+			pcsrc_out : out std_logic;
+			new_pc_in : in std_logic_vector(PC_WIDTH-1 downto 0);
+			new_pc_out : out std_logic_vector(PC_WIDTH-1 downto 0);
+			pc_decode_in : in std_logic_vector(PC_WIDTH-1 downto 0);
+			pc_exec_in : in std_logic_vector(PC_WIDTH-1 downto 0);
+			pc_mem_in : in std_logic_vector(PC_WIDTH-1 downto 0);
+			exc_dec : in std_logic;
+			exc_ovf : in std_logic;
+			exc_load : in std_logic;
+			exc_store : in std_logic;
+			intr : in std_logic_vector(INTR_COUNT-1 downto 0);
+			exec_op : in exec_op_type;
+			cop0_op : in cop0_op_type;
+			cop0_wrdata : out std_logic_vector(DATA_WIDTH-1 downto 0);
+			fl_decode : out std_logic;
+			fl_mem : out std_logic;
+			fl_exec : out std_logic;
+			fl_wb : out std_logic
+			);
 	end component;
 
 	component fwd is
@@ -135,7 +154,6 @@ architecture rtl of pipeline is
 
 	-- signals
 	signal stall : std_logic;
-	signal flush, fl_decode : std_logic;
 
 	signal fetch_pc_out	   : std_logic_vector(PC_WIDTH-1 downto 0);
 	signal fetch_instr	   : std_logic_vector(INSTR_WIDTH-1 downto 0);
@@ -176,17 +194,24 @@ architecture rtl of pipeline is
 	signal forwardA		: fwd_type;
 	signal forwardB		: fwd_type;
 
+	signal cop0_pcsrc_out : std_logic;
+	signal cop0_new_pc_out : std_logic_vector(PC_WIDTH-1 downto 0);
+	signal cop0_wrdata : std_logic_vector(DATA_WIDTH-1 downto 0);
+	signal fl_decode : std_logic;
+	signal fl_mem : std_logic;
+	signal fl_exec : std_logic;
+	signal fl_wb : std_logic;
+
 begin  -- rtl
 	stall <= '1' when mem_in.busy = '1' else '0';
-	flush <= '0';
 
 	fetch_inst : fetch
 	port map (
 		clk => clk,
 		reset => reset,
 		stall => stall,
-		pcsrc => mem_pcsrc,
-		pc_in => mem_new_pc_out,
+		pcsrc => cop0_pcsrc_out,
+		pc_in => cop0_new_pc_out,
 		pc_out => fetch_pc_out,
 		instr => fetch_instr
 	);
@@ -216,7 +241,7 @@ begin  -- rtl
 		clk => clk,
 		reset => reset,
 		stall => stall,
-		flush => flush,
+		flush => fl_exec,
 		op => decode_exec_op,
 		rd => exec_rd,
 		rs => exec_rs,
@@ -247,7 +272,7 @@ begin  -- rtl
 			clk => clk,
 			reset => reset,
 			stall => stall,
-			flush => flush,
+			flush => fl_mem,
 			mem_op => exec_memop_out,
 			jmp_op => exec_jmpop_out,
 			wrdata => exec_wrdata,
@@ -276,7 +301,7 @@ begin  -- rtl
 			clk => clk,
 			reset => reset,
 			stall => stall,
-			flush => flush,
+			flush => fl_wb,
 			op => mem_wbop_out,
 			aluresult => mem_aluresult_out,
 			memresult => mem_memresult,
@@ -290,8 +315,26 @@ begin  -- rtl
 		port map (
 			clk => clk,
 			reset => reset,
-			pcsrc => mem_pcsrc,
-			fl_out => fl_decode
+			stall => stall,
+			pcsrc_in => mem_pcsrc,
+			pcsrc_out => cop0_pcsrc_out,
+			new_pc_in => mem_new_pc_out,
+			new_pc_out => cop0_new_pc_out,
+			pc_decode_in => decode_pc_out,
+			pc_exec_in => exec_pc_out,
+			pc_mem_in => mem_pc_out,
+			exc_dec => decode_exc_dec,
+			exc_ovf => exec_exc_ovf,
+			exc_load => mem_exc_load,
+			exc_store => mem_exc_store,
+			intr => intr,
+			exec_op => decode_exec_op,
+			cop0_op => decode_cop0_op,
+			cop0_wrdata => cop0_wrdata,
+			fl_decode => fl_decode,
+			fl_mem => fl_mem,
+			fl_exec => fl_exec,
+			fl_wb => fl_wb
 		);
 
 		fwd_inst : fwd
