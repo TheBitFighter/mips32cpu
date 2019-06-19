@@ -128,10 +128,16 @@ begin
 		if (current_op.branch = '1') then
 			new_pc <= adder_inter(PC_WIDTH-1 downto 0);
 		-- Check if a jump jump instruction was issued
-	elsif (jmpop_out = JMP_JMP and current_op.regdst = '0') then
+		elsif (jmpop_out = JMP_JMP and current_op.regdst = '0') then
 			new_pc <= current_op.imm(PC_WIDTH-3 downto 0) & "00";
 		elsif (jmpop_out = JMP_JMP and current_op.regdst = '1') then
-			new_pc <= current_op.readdata1(PC_WIDTH-1 downto 0);
+			if (forwardA_reg = FWD_ALU) then
+				new_pc <= mem_aluresult(PC_WIDTH-1 downto 0);
+			elsif (forwardA_reg = FWD_WB) then
+				new_pc <= wb_result(PC_WIDTH-1 downto 0);
+			else
+				new_pc <= current_op.readdata1(PC_WIDTH-1 downto 0);
+			end if;
 		else
 			new_pc <= (others=>'0');
 		end if;

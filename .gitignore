@@ -1,7 +1,7 @@
-top/quartus/db/*
-top/quartus/incremental_db/*
-top/quartus/simulation/*
-top/quartus/output_files/*
+./db/*
+./quartus/incremental_db/*
+./quartus/simulation/*
+./quartus/output_files/*
 *.qarlog
 *.xrf
 *.sdo

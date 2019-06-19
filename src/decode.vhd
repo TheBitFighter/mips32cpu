@@ -98,14 +98,17 @@ begin  -- rtl
 						exec_op.aluop <= ALU_SLL;
 						exec_op.readdata1 <= (0 to DATA_WIDTH-6 => '0') & shamt;
 						exec_op.useamt <= '1';
+						exec_op.rs <= (others => '0');
 					when "000010" => -- SRL
 						exec_op.aluop <= ALU_SRL;
 						exec_op.readdata1 <= (0 to DATA_WIDTH-6 => '0') & shamt;
 						exec_op.useamt <= '1';
+						exec_op.rs <= (others => '0');
 					when "000011" => -- SRA
 						exec_op.aluop <= ALU_SRA;
 						exec_op.readdata1 <= (0 to DATA_WIDTH-6 => '0') & shamt;
 						exec_op.useamt <= '1';
+						exec_op.rs <= (others => '0');
 					when "000100" => -- SLLV
 						exec_op.aluop <= ALU_SLL;
 					when "000110" => -- SRLV
@@ -152,16 +155,19 @@ begin  -- rtl
 						exec_op.branch <= '1';
 						jmp_op <= JMP_BLTZ;
 						exec_op.readdata2 <= (others => '0');
+						exec_op.rt <= (others => '0');
 					when "00001" => -- BGEZ
 						exec_op.aluop <= ALU_SUB;
 						exec_op.branch <= '1';
 						jmp_op <= JMP_BGEZ;
 						exec_op.readdata2 <= (others => '0');
+						exec_op.rt <= (others => '0');
 					when "10000" => -- BLTZAL
 						exec_op.aluop <= ALU_SUB;
 						exec_op.link <= '1';
 						exec_op.rd <= (others => '1'); -- r31
 						exec_op.branch <= '1';
+						exec_op.rt <= (others => '0');
 						jmp_op <= JMP_BLTZ;
 						wb_op.regwrite <= '1';
 						exec_op.readdata2 <= (others => '0');
@@ -170,6 +176,7 @@ begin  -- rtl
 						exec_op.link <= '1';
 						exec_op.rd <= (others => '1'); -- r31
 						exec_op.branch <= '1';
+						exec_op.rt <= (others => '0');
 						jmp_op <= JMP_BGEZ;
 						wb_op.regwrite <= '1';
 						exec_op.readdata2 <= (others => '0');
@@ -198,11 +205,13 @@ begin  -- rtl
 				exec_op.branch <= '1';
 				jmp_op <= JMP_BLEZ;
 				exec_op.readdata2 <= (others => '0');
+				exec_op.rt <= (others => '0');
 			when "000111" => -- BGTZ
 				exec_op.aluop <= ALU_SUB;
 				exec_op.branch <= '1';
 				jmp_op <= JMP_BGTZ;
 				exec_op.readdata2 <= (others => '0');
+				exec_op.rt <= (others => '0');
 			when "001000" => -- ADDI
 				exec_op.aluop <= ALU_ADD;
 				exec_op.useimm <= '1';
