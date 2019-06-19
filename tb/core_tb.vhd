@@ -26,7 +26,7 @@ architecture arch of core_tb is
   end component;
 
 
-  signal rx : std_logic;
+  signal rx, tx : std_logic;
   signal intr : std_logic_vector(INTR_COUNT-1 downto 0);
 
 begin
@@ -39,7 +39,7 @@ begin
   port map(
     clk => clk,
     reset => reset,
-    tx => open,
+    tx => tx,
     rx => rx,
     intr => intr
   );

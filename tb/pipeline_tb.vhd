@@ -45,8 +45,8 @@ begin
     wait for CLK_PERIOD/2 * 3;
     reset <= '1';
     wait for CLK_PERIOD * 71;
-    
-    /*wait for CLK_PERIOD * 0.5;
+
+    wait for CLK_PERIOD * 0.5;
     mem_in.busy <= '1';
     wait for CLK_PERIOD * 1;
 
@@ -149,7 +149,7 @@ begin
     wait for CLK_PERIOD;
     mem_in.busy <= '1';
     wait for CLK_PERIOD * 1;
-    mem_in.busy <= '0';*/
+    mem_in.busy <= '0';
 
     wait;
   end process;

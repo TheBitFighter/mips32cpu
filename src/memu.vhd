@@ -20,7 +20,7 @@ end memu;
 architecture rtl of memu is
 
 begin  -- rtl
-	M_byteena_wrdata_OUT : process(all)
+	M_byteena_wrdata_OUT : process(op, A, W, D)
 		variable BB, AA, XX : std_logic_vector(BYTE_WIDTH-1 downto 0);
 	begin
 		BB := W(2*BYTE_WIDTH-1 downto BYTE_WIDTH);
@@ -70,7 +70,7 @@ begin  -- rtl
 		end case;
 	end process;
 
-	R_OUT : process(all)
+	R_OUT : process(op, A, W, D)
 		variable DD, CC, BB, AA, SS, zero : std_logic_vector(BYTE_WIDTH-1 downto 0);
 	begin
 		DD := D(4*BYTE_WIDTH-1 downto 3*BYTE_WIDTH);
@@ -144,6 +144,7 @@ begin  -- rtl
 	end process;
 
 	XL_XS_adress_rd_wr_OUT : process(all)
+		constant zeros : std_logic_vector(ADDR_WIDTH-1 downto 0) := (others => '0');
 	begin
 		M.address <= A;
 		M.rd <= op.memread;
@@ -151,7 +152,7 @@ begin  -- rtl
 		XL <= '0';
 		XS <= '0';
 
-		if (op.memread = '1' and A = (0 to ADDR_WIDTH-1 => '0')) 		or
+		if (op.memread = '1' and A = zeros) 		or
 			 (op.memread = '1' and op.memtype 	 = MEM_H 		and (A(1 downto 0) = "01" or A(1 downto 0) = "11")) or
 			 (op.memread = '1' and op.memtype 	 = MEM_HU		and (A(1 downto 0) = "01" or A(1 downto 0) = "11")) or
 			 (op.memread = '1' and op.memtype 	 = MEM_W	 	and (A(1 downto 0) = "01" or A(1 downto 0) = "10" 	or A(1 downto 0) = "11")) then
@@ -160,7 +161,7 @@ begin  -- rtl
 				 M.wr <= '0';
 		end if;
 
-		if (op.memwrite = '1' and A = (0 to ADDR_WIDTH-1 => '0'))		or
+		if (op.memwrite = '1' and A = zeros)		or
 			 (op.memwrite = '1' and op.memtype 		= MEM_H		and (A(1 downto 0) = "01" or A(1 downto 0) = "11")) or
 			 (op.memwrite = '1' and op.memtype 		= MEM_HU 	and (A(1 downto 0) = "01" or A(1 downto 0) = "11")) or
 			 (op.memwrite = '1' and op.memtype 		= MEM_W 	and (A(1 downto 0) = "01" or A(1 downto 0) = "10" 	or A(1 downto 0) = "11")) then

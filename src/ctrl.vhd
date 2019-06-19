@@ -90,7 +90,7 @@ begin
 	bds.decode <= pcsrc_in;
 	new_pc.decode <= new_pc_in;
 
-	latch : process(clk, reset)
+	latch : process(clk, reset, stall)
 	begin
 		if (reset = '0') then
 			state <= IDLE;

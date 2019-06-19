@@ -261,7 +261,7 @@ begin  -- rtl
 		wbop_out => exec_wbop_out,
 		forwardA => forwardA,
 		forwardB => forwardB,
-		cop0_rddata => (others => '0'), -- ???
+		cop0_rddata => cop0_wrdata,
 		mem_aluresult => mem_aluresult_out,
 		wb_result => wb_result,
 		exc_ovf => exec_exc_ovf
