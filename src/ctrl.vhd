@@ -55,11 +55,11 @@ architecture rtl of ctrl is
 	alias I : std_logic is status_nxt(0);
 
 	-- exception codes
-	constant exc_code_dec : std_logic_vector(3 downto 0) := "1010";
-	constant exc_code_ovf : std_logic_vector(3 downto 0) := "1100";
-	constant exc_code_load : std_logic_vector(3 downto 0) := "0100";
-	constant exc_code_store : std_logic_vector(3 downto 0) := "0101";
-	constant exc_code_intr : std_logic_vector(3 downto 0) := "0000";
+	constant EXC_CODE_DEC : std_logic_vector(3 downto 0) := "1010";
+	constant EXC_CODE_OVF : std_logic_vector(3 downto 0) := "1100";
+	constant EXC_CODE_LOAD : std_logic_vector(3 downto 0) := "0100";
+	constant EXC_CODE_STORE : std_logic_vector(3 downto 0) := "0101";
+	constant EXC_CODE_INTR : std_logic_vector(3 downto 0) := "0000";
 
 	-- exceptions
 	signal exc_dec_reg, exc_ovf_reg, exc_load_reg, exc_store_reg : std_logic;
@@ -173,111 +173,111 @@ begin
 
 
 		-- cop0
-		--
-		-- if exc_dec_reg = '1' or exc_ovf_reg = '1' or exc_load_reg = '1' or exc_store_reg = '1' then --or intr_reg = '1' then
-		-- 	pcsrc_out <= '1';
-		-- 	new_pc_out <= EXCEPTION_PC;
-		-- else
-		-- 	pcsrc_out <= pcsrc_in;
-		-- 	new_pc_out <= new_pc_in;
-		-- end if;
-		--
-		-- case cop0_op.addr is
-		-- 	when STATUS_ADDR =>
-		-- 		if cop0_op.wr = '1' then
-		-- 			status_nxt <= exec_op.readdata2;
-		-- 		else
-		-- 			cop0_wrdata <= status;
-		-- 		end if;
-		-- 	when CAUSE_ADDR =>
-		-- 		if cop0_op.wr = '1' then
-		-- 			cause_nxt <= exec_op.readdata2;
-		-- 		else
-		-- 			cop0_wrdata <= cause;
-		-- 		end if;
-		-- 	when EPC_ADDR =>
-		-- 		if cop0_op.wr = '1' then
-		-- 			epc_nxt <= exec_op.readdata2;
-		-- 		else
-		-- 			cop0_wrdata <= epc;
-		-- 		end if;
-		-- 	when NPC_ADDR =>
-		-- 		if cop0_op.wr = '1' then
-		-- 			npc_nxt <= exec_op.readdata2;
-		-- 		else
-		-- 			cop0_wrdata <= npc;
-		-- 		end if;
-		-- 	when others => null;
-		-- end case;
-		--
-		-- if exc_dec_reg = '1' then
-		-- 	exc <= exc_code_dec;
-		-- 	epc_nxt <= (PC_WIDTH to DATA_WIDTH-1 => '0') & pc_exec_reg;
-		-- 	if bds.decode = '1' then
-		-- 		B <= '1';
-		-- 		npc_nxt <= (PC_WIDTH to DATA_WIDTH-1 => '0') & new_pc.decode;
-		-- 	else
-		-- 		B <= '0';
-		-- 		npc_nxt <= (PC_WIDTH to DATA_WIDTH-1 => '0') & pc_decode_reg;
-		-- 	end if;
-		-- 	state_next <= FLUSH2;
-		-- 	fl_decode <= '1';
-		-- 	fl_exec <= '1';
-		--
-		-- elsif exc_ovf_reg = '1' then
-		-- 	exc <= exc_code_ovf;
-		-- 	epc_nxt <= (PC_WIDTH to DATA_WIDTH-1 => '0') & pc_mem_reg;
-		-- 	if bds.exec = '1' then
-		-- 		B <= '1';
-		-- 		npc_nxt <= (PC_WIDTH to DATA_WIDTH-1 => '0') & new_pc.exec;
-		-- 	else
-		-- 		B <= '0';
-		-- 		npc_nxt <= (PC_WIDTH to DATA_WIDTH-1 => '0') & pc_exec_reg;
-		-- 	end if;
-		-- 	state_next <= FLUSH2;
-		-- 	fl_decode <= '1';
-		-- 	fl_exec <= '1';
-		-- 	fl_mem <= '1';
-		--
-		-- elsif exc_load_reg = '1' then
-		-- 	exc <= exc_code_load;
-		-- 	epc_nxt <= (PC_WIDTH to DATA_WIDTH-1 => '0') & pc_wb_reg;
-		-- 	if bds.mem = '1' then
-		-- 		B <= '1';
-		-- 		npc_nxt <= (PC_WIDTH to DATA_WIDTH-1 => '0') & new_pc.mem;
-		-- 	else
-		-- 		B <= '0';
-		-- 		npc_nxt <= (PC_WIDTH to DATA_WIDTH-1 => '0') & pc_mem_reg;
-		-- 	end if;
-		-- 	state_next <= FLUSH2;
-		-- 	fl_decode <= '1';
-		-- 	fl_exec <= '1';
-		-- 	fl_mem <= '1';
-		-- 	fl_wb <= '1';
-		--
-		-- elsif exc_store_reg = '1' then
-		-- 	exc <= exc_code_store;
-		-- 	epc_nxt <= (PC_WIDTH to DATA_WIDTH-1 => '0') & pc_wb_reg;
-		-- 	if bds.mem = '1' then
-		-- 		B <= '1';
-		-- 		npc_nxt <= (PC_WIDTH to DATA_WIDTH-1 => '0') & new_pc.mem;
-		-- 	else
-		-- 		B <= '0';
-		-- 		npc_nxt <= (PC_WIDTH to DATA_WIDTH-1 => '0') & pc_mem_reg;
-		-- 	end if;
-		-- 	state_next <= FLUSH2;
-		-- 	fl_decode <= '1';
-		-- 	fl_exec <= '1';
-		-- 	fl_mem <= '1';
-		-- 	fl_wb <= '1';
-		--
-		-- -- elsif intr_reg = '1' then
-		-- -- 	exc <= exc_code_intr;
-		-- 	--epc_nxt <=
-		-- 	--npc_nxt <=
-		-- 	-- ?????
-		--
-		-- end if;
+
+		if exc_dec_reg = '1' or exc_ovf_reg = '1' or exc_load_reg = '1' or exc_store_reg = '1' then --or intr_reg = '1' then
+			pcsrc_out <= '1';
+			new_pc_out <= EXCEPTION_PC;
+		else
+			pcsrc_out <= pcsrc_in;
+			new_pc_out <= new_pc_in;
+		end if;
+
+		case cop0_op.addr is
+			when STATUS_ADDR =>
+				if cop0_op.wr = '1' then
+					status_nxt <= exec_op.readdata2;
+				else
+					cop0_wrdata <= status;
+				end if;
+			when CAUSE_ADDR =>
+				if cop0_op.wr = '1' then
+					cause_nxt <= exec_op.readdata2;
+				else
+					cop0_wrdata <= cause;
+				end if;
+			when EPC_ADDR =>
+				if cop0_op.wr = '1' then
+					epc_nxt <= exec_op.readdata2;
+				else
+					cop0_wrdata <= epc;
+				end if;
+			when NPC_ADDR =>
+				if cop0_op.wr = '1' then
+					npc_nxt <= exec_op.readdata2;
+				else
+					cop0_wrdata <= npc;
+				end if;
+			when others => null;
+		end case;
+
+		if exc_dec_reg = '1' then
+			exc <= EXC_CODE_DEC;
+			epc_nxt <= (PC_WIDTH to DATA_WIDTH-1 => '0') & pc_exec_reg;
+			if bds.decode = '1' then
+				B <= '1';
+				npc_nxt <= (PC_WIDTH to DATA_WIDTH-1 => '0') & new_pc.decode;
+			else
+				B <= '0';
+				npc_nxt <= (PC_WIDTH to DATA_WIDTH-1 => '0') & pc_decode_reg;
+			end if;
+			state_next <= FLUSH2;
+			fl_decode <= '1';
+			fl_exec <= '1';
+
+		elsif exc_ovf_reg = '1' then
+			exc <= EXC_CODE_OVF;
+			epc_nxt <= (PC_WIDTH to DATA_WIDTH-1 => '0') & pc_mem_reg;
+			if bds.exec = '1' then
+				B <= '1';
+				npc_nxt <= (PC_WIDTH to DATA_WIDTH-1 => '0') & new_pc.exec;
+			else
+				B <= '0';
+				npc_nxt <= (PC_WIDTH to DATA_WIDTH-1 => '0') & pc_exec_reg;
+			end if;
+			state_next <= FLUSH2;
+			fl_decode <= '1';
+			fl_exec <= '1';
+			fl_mem <= '1';
+
+		elsif exc_load_reg = '1' then
+			exc <= EXC_CODE_LOAD;
+			epc_nxt <= (PC_WIDTH to DATA_WIDTH-1 => '0') & pc_wb_reg;
+			if bds.mem = '1' then
+				B <= '1';
+				npc_nxt <= (PC_WIDTH to DATA_WIDTH-1 => '0') & new_pc.mem;
+			else
+				B <= '0';
+				npc_nxt <= (PC_WIDTH to DATA_WIDTH-1 => '0') & pc_mem_reg;
+			end if;
+			state_next <= FLUSH2;
+			fl_decode <= '1';
+			fl_exec <= '1';
+			fl_mem <= '1';
+			fl_wb <= '1';
+
+		elsif exc_store_reg = '1' then
+			exc <= EXC_CODE_STORE;
+			epc_nxt <= (PC_WIDTH to DATA_WIDTH-1 => '0') & pc_wb_reg;
+			if bds.mem = '1' then
+				B <= '1';
+				npc_nxt <= (PC_WIDTH to DATA_WIDTH-1 => '0') & new_pc.mem;
+			else
+				B <= '0';
+				npc_nxt <= (PC_WIDTH to DATA_WIDTH-1 => '0') & pc_mem_reg;
+			end if;
+			state_next <= FLUSH2;
+			fl_decode <= '1';
+			fl_exec <= '1';
+			fl_mem <= '1';
+			fl_wb <= '1';
+
+		-- elsif intr_reg = '1' then
+		-- 	exc <= exc_code_intr;
+			--epc_nxt <=
+			--npc_nxt <=
+			-- ?????
+
+		end if;
 
 
 

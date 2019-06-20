@@ -146,7 +146,9 @@ begin
 	-- Set the alu inputs as needed
 	alu_in : process(all)
 	begin
-		if (forwardA_reg = FWD_ALU) then
+		if (current_op.useamt = '1') then
+			first_operator <= current_op.readdata1;
+		elsif (forwardA_reg = FWD_ALU) then
 			first_operator <= mem_aluresult;
 		elsif (forwardA_reg = FWD_WB) then
 			first_operator <= wb_result;
