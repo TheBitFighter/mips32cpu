@@ -58,6 +58,10 @@ architecture rtl of mem is
 	signal op_reg : mem_op_type;
 	signal wrdata_reg : std_logic_vector(DATA_WIDTH-1 downto 0);
 	signal aluresult_next : std_logic_vector(DATA_WIDTH-1 downto 0);
+
+	signal jmp_op_reg : jmp_op_type;
+	signal N, Z : std_logic;
+	signal new_pc_in_reg : std_logic_vector(PC_WIDTH-1 downto 0);
 begin  -- rtl
 	mem : process(clk, reset)
 	begin
@@ -69,6 +73,14 @@ begin  -- rtl
 
 			mem_op_reg <= MEM_NOP;
 			wrdata_reg <= (others => '0');
+			jmp_op_reg <= JMP_NOP;
+			N <= '0';
+			Z <= '0';
+			new_pc_in_reg <= (others => '0');
+		elsif flush = '1' then
+			jmp_op_reg <= JMP_NOP;
+			mem_op_reg <= MEM_NOP;
+			wbop_out <= WB_NOP;
 		elsif rising_edge(clk) then
 			stall_reg <= stall;
 			if stall = '0' then
@@ -79,28 +91,32 @@ begin  -- rtl
 
 				mem_op_reg <= mem_op;
 				wrdata_reg <= wrdata;
+				jmp_op_reg <= jmp_op;
+				N <= neg;
+				Z <= zero;
+				new_pc_in_reg <= new_pc_in;
 			end if;
-			if flush = '1' then
-				pc_out <= (others => '0');
-				rd_out <= (others => '0');
-				aluresult_next <= (others => '0');
-				wbop_out <= WB_NOP;
-
-				mem_op_reg <= MEM_NOP;
-				wrdata_reg <= (others => '0');
-			end if;
+			-- if flush = '1' then
+			-- 	pc_out <= (others => '0');
+			-- 	rd_out <= (others => '0');
+			-- 	aluresult_next <= (others => '0');
+			-- 	wbop_out <= WB_NOP;
+			--
+			-- 	mem_op_reg <= MEM_NOP;
+			-- 	wrdata_reg <= (others => '0');
+			-- end if;
 		end if;
 	end process;
 
 	jmpu_inst : jmpu
 	port map(
-		op => jmp_op,
-		N => neg,
-		Z => zero,
+		op => jmp_op_reg,
+		N => N,
+		Z => Z,
 		J => pcsrc
 	);
 
-	new_pc_out <= new_pc_in;
+	new_pc_out <= new_pc_in_reg;
 
 	op_reg_p : process(all)
 	begin

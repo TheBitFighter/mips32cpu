@@ -58,15 +58,18 @@ begin  -- rtl
 		if reset = '0' then
 			instr_reg <= (others => '0');
 			pc_out <= (others => '0');
-		elsif rising_edge(clk) then
+		elsif flush = '1' then
+			instr_reg <= (others => '0');
+		end if;
+		if rising_edge(clk) then
 			if stall = '0' then
 				instr_reg <= instr;
 				pc_out <= pc_in;
 			end if;
-			if flush = '1' then
-				instr_reg <= (others => '0');
-				pc_out <= (others => '0');
-			end if;
+			-- if flush = '1' then
+			-- 	instr_reg <= (others => '0');
+			-- 	pc_out <= (others => '0');
+			-- end if;
 		end if;
 	end process;
 
@@ -148,6 +151,7 @@ begin  -- rtl
 						exec_op.rs <= rs;
 						exec_op.regdst <= '1';
 						exec_op.link <= '1';
+						exec_op.rd <= rd_r;
 					when "100000" => -- ADD
 						exec_op.aluop <= ALU_ADD;
 						exec_op.readdata1 <= rddata1;
@@ -236,7 +240,7 @@ begin  -- rtl
 						exec_op.readdata1 <= rddata1;
 						exec_op.rs <= rs;
 						exec_op.branch <= '1';
-						jmp_op <= JMP_BLTZ;
+						jmp_op <= JMP_BGEZ;
 					when "10000" => -- BLTZAL
 						exec_op.aluop <= ALU_SUB;
 						exec_op.readdata1 <= rddata1;
@@ -251,7 +255,7 @@ begin  -- rtl
 						exec_op.readdata1 <= rddata1;
 						exec_op.rs <= rs;
 						exec_op.branch <= '1';
-						jmp_op <= JMP_BLTZ;
+						jmp_op <= JMP_BGEZ;
 						exec_op.link <= '1';
 						wb_op.regwrite <= '1';
 						exec_op.rd <= (others => '1'); -- r31
@@ -259,11 +263,9 @@ begin  -- rtl
 						exc_dec <= '1';
 				end case;
 			when "000010" => -- J
-				exec_op.useimm <= '1';
 				jmp_op <= JMP_JMP;
 				exec_op.imm <= (16 to DATA_WIDTH-1 => '0') & address_immediate;
 			when "000011" => -- JAL
-				exec_op.useimm <= '1';
 				exec_op.link <= '1';
 				exec_op.rd <= (others => '1'); -- r31
 				jmp_op <= JMP_JMP;

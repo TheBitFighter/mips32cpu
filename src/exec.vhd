@@ -52,6 +52,7 @@ architecture rtl of exec is
 	signal first_operator, second_operator : std_logic_vector(DATA_WIDTH-1 downto 0);
 	signal exc_ovf_int, zero_int : std_logic;
 	signal forwardA_reg, forwardB_reg : fwd_type;
+	signal cop0_rddata_reg : std_logic_vector(DATA_WIDTH-1 downto 0);
 begin
 
 	-- Breakout signals from instruction
@@ -68,6 +69,7 @@ begin
 			current_op <= EXEC_NOP;
 			forwardA_reg <= FWD_NONE;
 			forwardB_reg <= FWD_NONE;
+			cop0_rddata_reg <= (others => '0');
 
 			-- Reset forward signals
 			pc_out <= (others=>'0');
@@ -75,30 +77,36 @@ begin
 			jmpop_out <= JMP_NOP;
 			wbop_out <= WB_NOP;
 
+		elsif flush = '1' then
+			current_op <= EXEC_NOP;
+			memop_out <= MEM_NOP;
+			jmpop_out <= JMP_NOP;
+			wbop_out <= WB_NOP;
 		elsif (rising_edge(clk)) then
 			-- Stall the pipeline
 			if (stall = '0') then
 				current_op <= op;
 				forwardA_reg <= forwardA;
 				forwardB_reg <= forwardB;
+				cop0_rddata_reg <= cop0_rddata;
 				-- Forward signals
 				pc_out <= pc_in;
 				memop_out <= memop_in;
 				jmpop_out <= jmpop_in;
 				wbop_out <= wbop_in;
 			end if;
-			if (flush = '1') then
-				-- Flush the operation registers
-				current_op <= EXEC_NOP;
-				forwardA_reg <= FWD_NONE;
-				forwardB_reg <= FWD_NONE;
-
-				-- Reset forward signals
-				pc_out <= (others=>'0');
-				memop_out <= MEM_NOP;
-				jmpop_out <= JMP_NOP;
-				wbop_out <= WB_NOP;
-			end if;
+			-- if (flush = '1') then
+			-- 	-- Flush the operation registers
+			-- 	current_op <= EXEC_NOP;
+			-- 	forwardA_reg <= FWD_NONE;
+			-- 	forwardB_reg <= FWD_NONE;
+			-- 	cop0_rddata_reg <= (others => '0');
+			-- 	-- Reset forward signals
+			-- 	pc_out <= (others=>'0');
+			-- 	memop_out <= MEM_NOP;
+			-- 	jmpop_out <= JMP_NOP;
+			-- 	wbop_out <= WB_NOP;
+			-- end if;
 		end if;
 	end process;
 
@@ -113,7 +121,7 @@ begin
 		exc_ovf <= exc_ovf_int and current_op.ovf;
 		-- Check for a cop0 instruction
 		if (current_op.cop0 = '1') then
-			aluresult <= cop0_rddata;
+			aluresult <= cop0_rddata_reg;
 		-- Check if the pc should be used for output
 		elsif (current_op.link = '1') then
 			aluresult <= (pc_out'length to DATA_WIDTH-1 => '0') & std_logic_vector(signed(pc_out)+ 4);

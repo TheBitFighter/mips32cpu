@@ -14,40 +14,82 @@ architecture arch of core_tb is
   signal counter : natural := 0;
   signal reset, clk : std_logic;
 
-  component core is
-  	generic (
-  		clk_freq : integer;
-  		baud_rate : integer);
-  	port (
-  		clk, reset  : in  std_logic;
-  		tx  		: out std_logic;
-  		rx          : in  std_logic;
-  		intr        : in  std_logic_vector(INTR_COUNT-1 downto 0));
-  end component;
-
-
-  signal rx, tx : std_logic;
   signal intr : std_logic_vector(INTR_COUNT-1 downto 0);
+
+  signal mem_out : mem_out_type;
+	signal mem_in  : mem_in_type;
+
+	--signal ocram_rd : std_logic;
+	signal ocram_wr : std_logic;
+	signal ocram_rddata : std_logic_vector(DATA_WIDTH-1 downto 0);
+
+	signal uart_rd : std_logic;
+	signal uart_wr : std_logic;
+	signal uart_rddata : std_logic_vector(DATA_WIDTH-1 downto 0);
+
+	type mux_type is (MUX_OCRAM, MUX_UART);
+	signal mux : mux_type;
 
 begin
 
-  core_inst : core
-  generic map(
-    clk_freq => 50_000_000,
-    baud_rate => 115200
-  )
-  port map(
-    clk => clk,
-    reset => reset,
-    tx => tx,
-    rx => rx,
-    intr => intr
-  );
+  pipeline : entity work.pipeline port map (
+		clk	    => clk,
+		reset   => reset,
+		mem_in  => mem_in,
+		mem_out => mem_out,
+		intr    => intr);
+
+	ocram : entity work.ocram_altera port map (
+		address => mem_out.address(11 downto 2),
+		byteena => mem_out.byteena,
+		clock	=> clk,
+		data	=> mem_out.wrdata,
+		wren	=> ocram_wr,
+		q		=> ocram_rddata);
+
+	iomux: process (mem_out, mux, ocram_rddata, uart_rddata)
+	begin  -- process mux
+
+		mux <= MUX_OCRAM;
+
+		case mem_out.address(ADDR_WIDTH-1 downto ADDR_WIDTH-2) is
+			when "00" => mux <= MUX_OCRAM;
+			when "11" => mux <= MUX_UART;
+			when others => null;
+		end case;
+
+		mem_in.busy <= mem_out.rd;
+
+		mem_in.rddata <= (others => '0');
+		case mux is
+			when MUX_OCRAM => mem_in.rddata <= ocram_rddata;
+			when MUX_UART  => --mem_in.rddata <= uart_rddata;
+        mem_in.rddata <= (others => '0');
+        if mem_out.address(2) = '0' then
+          mem_in.rddata(24) <= '1';
+        end if;
+			when others => null;
+		end case;
+
+		--ocram_rd <= '0';
+		ocram_wr <= '0';
+		if mux = MUX_OCRAM then
+			--ocram_rd <= mem_out.rd;
+			ocram_wr <= mem_out.wr;
+		end if;
+
+		uart_rd <= '0';
+		uart_wr <= '0';
+		-- if mux = MUX_UART then
+		-- 	uart_rd <= mem_out.rd;
+		-- 	uart_wr <= mem_out.wr;
+		-- end if;
+
+	end process iomux;
 
   sim : process
   begin
     reset <= '0';
-    rx <= '0';
     intr <= (others => '0');
 
     wait for CLK_PERIOD/2 * 3;
