@@ -63,7 +63,7 @@ architecture rtl of mem is
 	signal N, Z : std_logic;
 	signal new_pc_in_reg : std_logic_vector(PC_WIDTH-1 downto 0);
 begin  -- rtl
-	mem : process(clk, reset)
+	mem : process(clk, reset, flush)
 	begin
 		if reset = '0' then
 			pc_out <= (others => '0');
@@ -96,15 +96,6 @@ begin  -- rtl
 				Z <= zero;
 				new_pc_in_reg <= new_pc_in;
 			end if;
-			-- if flush = '1' then
-			-- 	pc_out <= (others => '0');
-			-- 	rd_out <= (others => '0');
-			-- 	aluresult_next <= (others => '0');
-			-- 	wbop_out <= WB_NOP;
-			--
-			-- 	mem_op_reg <= MEM_NOP;
-			-- 	wrdata_reg <= (others => '0');
-			-- end if;
 		end if;
 	end process;
 

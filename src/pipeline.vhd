@@ -167,7 +167,7 @@ architecture rtl of pipeline is
 	signal decode_exc_dec    : std_logic;
 
 	signal exec_pc_out								: std_logic_vector(PC_WIDTH-1 downto 0);
-	signal exec_rd, exec_rs, exec_rt	: std_logic_vector(REG_BITS-1 downto 0);
+	signal exec_rd										: std_logic_vector(REG_BITS-1 downto 0);
 	signal exec_aluresult							: std_logic_vector(DATA_WIDTH-1 downto 0);
 	signal exec_wrdata           			: std_logic_vector(DATA_WIDTH-1 downto 0);
 	signal exec_zero, exec_neg        : std_logic;
@@ -244,8 +244,8 @@ begin  -- rtl
 		flush => fl_exec,
 		op => decode_exec_op,
 		rd => exec_rd,
-		rs => exec_rs,
-		rt => exec_rt,
+		rs => open,
+		rt => open,
 		aluresult => exec_aluresult,
 		wrdata => exec_wrdata,
 		zero => exec_zero,

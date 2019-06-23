@@ -24,7 +24,7 @@ end wb;
 architecture rtl of wb is
 
 begin  -- rtl
-	wb : process(all)
+	wb : process(clk, reset, flush)
 	begin
 		if reset = '0' or flush = '1' then
 			rd_out <= (others => '0');
@@ -40,11 +40,6 @@ begin  -- rtl
 					result <= aluresult;
 				end if;
 			end if;
-			-- if flush = '1' then
-			-- 	rd_out <= (others => '0');
-			-- 	result <= (others => '0');
-			-- 	regwrite <= '0';
-			-- end if;
 		end if;
 	end process;
 end rtl;

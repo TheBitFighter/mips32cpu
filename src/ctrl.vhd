@@ -90,7 +90,7 @@ begin
 	bds.decode_taken <= pcsrc_in;
 	new_pc.decode <= new_pc_in;
 
-	latch : process(clk, reset)
+	latch : process(clk, reset, stall)
 	begin
 		if (reset = '0') then
 			exc_dec_reg <= '0';
@@ -257,10 +257,10 @@ begin
 			fl_mem <= '1';
 			fl_wb <= '1';
 
-		-- elsif intr_reg = '1' then
-		-- 	exc <= exc_code_intr;
-			--epc_nxt <=
-			--npc_nxt <=
+		elsif intr_reg = "111" then
+			exc <= exc_code_intr;
+			-- epc_nxt <=
+			-- npc_nxt <=
 			-- ?????
 
 		end if;

@@ -53,23 +53,27 @@ architecture rtl of decode is
 
 begin  -- rtl
 
-	latch : process(clk, reset)
+	latch_instr : process(clk, reset, flush)
 	begin
 		if reset = '0' then
 			instr_reg <= (others => '0');
-			pc_out <= (others => '0');
 		elsif flush = '1' then
 			instr_reg <= (others => '0');
-		end if;
-		if rising_edge(clk) then
+		elsif rising_edge(clk) then
 			if stall = '0' then
 				instr_reg <= instr;
+			end if;
+		end if;
+	end process;
+
+	latch_pc : process(clk, reset)
+	begin
+		if reset = '0' then
+			pc_out <= (others => '0');
+		elsif rising_edge(clk) then
+			if stall = '0' then
 				pc_out <= pc_in;
 			end if;
-			-- if flush = '1' then
-			-- 	instr_reg <= (others => '0');
-			-- 	pc_out <= (others => '0');
-			-- end if;
 		end if;
 	end process;
 
@@ -82,16 +86,7 @@ begin  -- rtl
 		wb_op <= WB_NOP;
 		exc_dec <= '0';
 
-		-- exec_op.readdata1 <= rddata1;
-		-- exec_op.readdata2 <= rddata2;
-		-- exec_op.rs <= rs;
-		-- exec_op.rt <= rt;
 		exec_op.imm <= (16 to DATA_WIDTH-1 => address_immediate(15)) & address_immediate;
-		-- if opcode = "000000" or opcode = "010000" then
-		-- 	exec_op.rd <= rd_r;
-		-- else
-		-- 	exec_op.rd <= rd_i;
-		-- end if;
 
 		case opcode is
 			when "000000" => -- MiMi special instruction

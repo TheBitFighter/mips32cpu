@@ -61,7 +61,7 @@ begin
 	rt <= current_op.rt;
 
 	-- Synchronous Process
-	latch : process(clk, reset)
+	latch : process(clk, reset, flush)
 	begin
 		-- Asynchronous reset
 		if (reset = '0') then
@@ -95,18 +95,6 @@ begin
 				jmpop_out <= jmpop_in;
 				wbop_out <= wbop_in;
 			end if;
-			-- if (flush = '1') then
-			-- 	-- Flush the operation registers
-			-- 	current_op <= EXEC_NOP;
-			-- 	forwardA_reg <= FWD_NONE;
-			-- 	forwardB_reg <= FWD_NONE;
-			-- 	cop0_rddata_reg <= (others => '0');
-			-- 	-- Reset forward signals
-			-- 	pc_out <= (others=>'0');
-			-- 	memop_out <= MEM_NOP;
-			-- 	jmpop_out <= JMP_NOP;
-			-- 	wbop_out <= WB_NOP;
-			-- end if;
 		end if;
 	end process;
 
