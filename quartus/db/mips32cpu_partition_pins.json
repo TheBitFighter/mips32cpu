@@ -1,0 +1,33 @@
+{
+	"partitions" : [
+		{
+			"name" : "Top",
+			"pins" : [
+				{
+					"name" : "tx",
+					"strict" : false
+				},
+				{
+					"name" : "rx",
+					"strict" : false
+				},
+				{
+					"name" : "reset_pin",
+					"strict" : false
+				},
+				{
+					"name" : "intr_pin[0]",
+					"strict" : false
+				},
+				{
+					"name" : "intr_pin[1]",
+					"strict" : false
+				},
+				{
+					"name" : "intr_pin[2]",
+					"strict" : false
+				}
+			]
+		}
+	]
+}
